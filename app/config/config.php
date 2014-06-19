@@ -1,0 +1,5 @@
+<?php
+/*
+ * Sensitive configuration information.
+ */
+?>
