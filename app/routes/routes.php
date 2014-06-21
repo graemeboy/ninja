@@ -50,14 +50,26 @@ $router->get('/admin', function () use ($admin, $router) {
 $router->get('/admin/dashboard', function () use ($admin, $router) {
     $admin->dashboard($router);
 });
-// Add Posts and Pages
+// Add Posts and Pages and Media
 $router->get('/admin/add-post', function () use ($admin, $router) {
     $admin->add_post($router);
 });
 $router->get('/admin/add-page', function () use ($admin, $router) {
     $admin->add_post($router);
 });
-
+$router->get('/admin/add-media', function () use ($admin, $router) {
+    $admin->add_media($router);
+});
+// Manage Posts, Pages, and Media
+$router->get('/admin/manage-posts', function () use ($admin, $router) {
+    $admin->manage_posts($router);
+});
+$router->get('/admin/manage-pages', function () use ($admin, $router) {
+    $admin->manage_posts($router);
+});
+$router->get('/admin/manage-media', function () use ($admin, $router) {
+    $admin->manage_media($router);
+});
 // Dynamic Routes
 // Posts or Pages
 $router->get('/:slug', function ($slug) use ($front, $router) {
