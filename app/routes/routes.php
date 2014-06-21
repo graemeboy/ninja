@@ -3,7 +3,7 @@ echo "Creating new Slim object<br/>";
 $router = new \Slim\Slim();
 $router->config(array(
     'debug' => true,
-    'templates.path' => APPPATH . 'views/_templates'
+    'templates.path' => APPPATH . 'views/'
 ));
 
 /*
@@ -30,9 +30,10 @@ echo "Controllers have be added<br/>";
 // * Define Static Frontend Routes
 // * ------------------------------------
 // */
+$front = new Front();
 // Homepage.
-$router->get('/', function () {
-    $front = new Front();
+$router->get('/', function () use ($front) {
+    
     $front->index();
 });
 /*
@@ -40,21 +41,26 @@ $router->get('/', function () {
  * Define Static Admin Routes
  * ------------------------------------
  */
-
+$admin = new Admin();
 // Admin Index
-$router->get('/admin', function () {
-    $admin = new Admin();
-    $admin->index();
+$router->get('/admin', function () use ($admin, $router) {
+    $admin->index($router);
 });
 // Admin Dashboard
-$router->get('/admin/dashboard', function () {
-    $admin = new Admin();
-    $admin->dashboard();
+$router->get('/admin/dashboard', function () use ($admin, $router) {
+    $admin->dashboard($router);
+});
+// Add Posts and Pages
+$router->get('/admin/add-post', function () use ($admin, $router) {
+    $admin->add_post($router);
+});
+$router->get('/admin/add-page', function () use ($admin, $router) {
+    $admin->add_post($router);
 });
 
 // Dynamic Routes
 // Posts or Pages
-$router->get('/:slug', function ($slug) use ($router) {
+$router->get('/:slug', function ($slug) use ($front, $router) {
     // Check to see if it is a posts   
     echo "Checking for post with slug: $slug in " . DATAPATH. "posts/posts_summary.json<br/>";
     
