@@ -1,5 +1,17 @@
 <?php
 
+    $home_navigation = array (
+        'dashboard' => array (
+            'title' => 'Admin Dashboard',
+            'icon' => 'glyphicon glyphicon-home'
+        ),
+    );
+    $settings_navigation = array (
+        'settings-site' => array (
+            'title' => 'Site Settings',
+            'icon' => 'glyphicon glyphicon-cog'
+        ),
+    );
     // Define menu items for adding posts and pages
     $core_navigation_add = array (
         'add-post' => array (
@@ -32,10 +44,13 @@
     );
     
     // Print the dashboard link
-    print_menu_item("dashboard", 
-                    "Dashboard", 
-                    "glyphicon glyphicon-home");
-
+//    print_menu_item("dashboard", 
+//                    "Dashboard", 
+//                    "glyphicon glyphicon-home");
+//    print_menu_list_divider();
+    if (!empty($home_navigation)) {
+        print_menu_list("Home", $home_navigation);
+    } // if
     // Print the menu to add posts and pages
     if (!empty($core_navigation_add)) {
         print_menu_list("Add Content", $core_navigation_add);
@@ -44,11 +59,13 @@
     if (!empty($core_navigation_add)) {
         print_menu_list("Manage Content", $core_navigation_manage);
     } // if
-
+    if (!empty($settings_navigation)) {
+        print_menu_list("Settings", $settings_navigation);
+    } // if
 /**
  * function create_menu_list
  * Takes a list of menu items, and creates a menu list from
- * those items. Menu lists are divided by <hr> tags.
+ * those items. Menu lists are divided by the menu list divider.
  * 
  * @param subtitle, the title of this menu list
  * @param $menu_items, a list of items including href, title, icon
@@ -73,8 +90,9 @@ function print_menu_list ($list_title, $menu_items) {  ?>
             $icon = '';
         } // else
         print_menu_item ($href, $title, $icon);
-    } // foreach ?>
-    <hr> </div> <!-- .menu-list -->
+    } // foreach 
+    print_menu_list_divider();
+    ?> </div> <!-- .menu-list -->
 <?php } // create_menu_list (arrary)
 
 /**
@@ -117,4 +135,8 @@ function print_menu_item ($href, $title, $icon) {
 function print_menu_subtitle ($subtitle) { ?>
     <div class="nav-menu-subtitle"><?php echo $subtitle ?></div>
 <?php } // print_menu_subtitle (string)
+
+function print_menu_list_divider() {
+    echo "<hr>";
+}
 ?>

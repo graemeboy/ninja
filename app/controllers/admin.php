@@ -91,4 +91,15 @@ class Admin extends Controller
             'meta_title' => 'Manage Media - Admin Dashboard'
         ));
     } // manage_media (slim Obj)
+    
+    /*-------------------------------
+     * Settings Pages 
+     *-------------------------------
+     */
+    public function settings_site($slim) {
+        $slim->render('admin/settings/settings-site.php', array (
+            'head_title' => "Site Settings",
+            'meta_title' => 'Site Settings - Admin Dashboard'
+        ));
+    } // settings_site (slim Obj)
 } // class Admin

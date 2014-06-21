@@ -70,6 +70,10 @@ $router->get('/admin/manage-pages', function () use ($admin, $router) {
 $router->get('/admin/manage-media', function () use ($admin, $router) {
     $admin->manage_media($router);
 });
+// Settings Pages
+$router->get('/admin/settings-site', function () use ($admin, $router) {
+    $admin->settings_site($router);
+});
 // Dynamic Routes
 // Posts or Pages
 $router->get('/:slug', function ($slug) use ($front, $router) {
