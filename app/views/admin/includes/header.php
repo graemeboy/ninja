@@ -12,6 +12,30 @@
         #admin-header-wrap, #admin-header-wrap a {
             color:#fff;   
         }
+        /* Side Menu */
+        #admin-menu {
+            height: 100%;
+            overflow-y: scroll;
+        }
+        #admin-menu {
+            padding-top: 10px;
+            padding-right:0;
+        }
+        .nav-menu-subtitle {
+            color: #bbb;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .nav-menu-item {
+            padding: 10px;
+        }
+        .nav-item-active {
+            border-right: 2px solid green;
+        }
+        .admin-menu-icon {
+            margin-right: 15px;
+        }
+        
     </style>
 </head>
 
@@ -27,8 +51,8 @@
             <div class="clearfix"></div>
         </div>
         
-        <div id="admin-menu" class="col-sm-3">
+        <div id="admin-menu" class="col-sm-2">
             <?php include_once('navigation/nav.php') ?>
         </div>
-        <div id="admin-content" class="col-sm-9">
-        
+        <div id="admin-content" class="col-sm-10">
+        Main admin content
