@@ -7,10 +7,18 @@
     <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700' rel='stylesheet' type='text/css'>
     <style type="text/css">
+        body {
+            font-family: 'Open Sans', 'Lucida Grande', helvetica, sans-serif;
+            font-weight: lighter; 
+        }
         #admin-header-wrap {
             background-color: #333;
-            padding: 8px;
+            padding: 10px;
+        }
+        #admin-head-title {
+            font-size: 16px
         }
         #admin-header-wrap,
         #admin-header-wrap a {
@@ -31,10 +39,17 @@
             padding-left:0; 
         }
         .nav-menu-title {
-            font-size: 15px;
+            font-size: 16px;
         }
-        .nav-menu-item, .nav-menu-title, .nav-menu-list {
+        .nav-menu-title, .nav-menu-list {
             padding: 10px;
+        }
+        .nav-menu-item {
+            padding: 5px;
+            margin: 5px 0 5px 10px;
+        }
+        .nav-menu-list {
+            padding-right:0;   
         }
         .nav-menu-title {
         }
@@ -47,10 +62,10 @@
             background-color: #2f3130;
         }
         .nav-inner-menu a {
-            font-size: 13px   
+            font-size: 14px   
         }
         .nav-item-active {
-            border-right: 2px solid green;
+            border-right: 5px solid #5dd680;
         }
         .admin-menu-icon {
             margin-right: 15px;
@@ -65,7 +80,7 @@
     <div id="admin-wrap">
         <div id="admin-header-wrap">
             <div id="admin-header-left" class="container-fluid pull-left">
-                <?php echo APPPATH ?>
+                <span id="admin-head-title"><?php echo SITETITLE ?></span>
             </div>
             <div id="admin-header-right" class="container-fluid pull-right">
                 <a href="" class="admin-logout-link">Logout</a>

@@ -12,10 +12,12 @@
         )
     );
     $settings_navigation = array (
-        'settings-site' => array (
-            'title' => 'Site Settings',
-            'icon' => 'glyphicon glyphicon-cog'
-        ),
+        'icon' => 'glyphicon glyphicon-cog',
+        'children' => array (
+            'settings-site' => array (
+                'title' => 'Site Settings',
+            ),
+        )
     );
     // Define menu items for adding posts and pages
     
@@ -45,15 +47,16 @@
         )
     );
     $core_navigation_media = array (
+        'icon' => 'glyphicon glyphicon-picture',
+        'children' => array (
                 'add-media' => array (
                 'title' => 'Add Media',
-                'icon' => 'glyphicon glyphicon-picture'
             ),
                 'manage-media' => array (
                 'title' => 'Manage Media',
-                'icon' => 'glyphicon glyphicon-picture'
             )
-        );
+        )
+    );
     
     // Print the dashboard link
 //    print_menu_item("dashboard", 
@@ -71,8 +74,11 @@
     if (!empty($core_navigation_pages)) {
         print_menu_list("Pages", $core_navigation_pages);
     } // if
+    if (!empty($core_navigation_media)) {
+        print_menu_list("Media", $core_navigation_media);
+    } // if
     if (!empty($settings_navigation)) {
-        //print_menu_list("Settings", $settings_navigation);
+        print_menu_list("Settings", $settings_navigation);
     } // if
 /**
  * function create_menu_list
