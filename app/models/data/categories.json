@@ -1,5 +1,0 @@
-// Contains a list of JSON objects for each category.
-// Object Structure is name: slug
-}[{
-    'Uncategorized': 'uncategorized'
-}]

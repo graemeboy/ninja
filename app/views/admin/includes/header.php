@@ -39,6 +39,25 @@
             -webkit-border-radius: 0;
             -moz-border-radius: 0;
         }
+        /* Tables */
+        .admin-table th, .admin-table td, label {
+            font-weight: lighter;   
+        }
+        .table-select {
+            width: 30px;
+        }
+        .admin-table a {
+            color: #fff;
+        }
+        .form-control:focus {
+            border: none;
+            box-shadow:  none;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            transition: none;
+            -moz-transition: none;
+            -webkit-transition: none;
+        }
         .form-control::-webkit-input-placeholder { /* WebKit browsers */
             color:    #fff;
         }
@@ -152,15 +171,16 @@
 /*
  * Mark it up
  */
+        
+.markItUpHeader {
+    margin-bottom: 5px;
+}
 .markItUpHeader ul {
     padding-left: 0;
 }
 .markItUpHeader ul li	{
 	list-style:none;
-    float:left;
-}
-.markItUpHeader ul li:hover > ul{
-	display:block;
+    display:inline-block;
 }
 .markItUpHeader ul .markItUpDropMenu li {
 	margin-right:0px;
@@ -168,12 +188,39 @@
 .markItUpHeader ul a {
 	display:block;
 	padding: 10px;
-	margin: 5px;
+    width: 45px;
+    text-align:center;
     color: #fff;
     background: rgba(0,0,0,0.2);
-    border-radius: 0;
-    line-height:15px;
+    line-height:14px;
 }
+        .markItUpHeader ul a:hover {
+            text-decoration: none;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .edit-page-icon, .edit-page-title {
+            text-align:center;   
+        }
+        .edit-page-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        a.edit-page-action i {
+            padding-right: 5px
+        }
+        a.edit-page-action {
+            display: block;
+            padding: 10px 0;
+            text-align:center
+        }
+        td.edit-post-actions {
+            padding: 0 !important;   
+        }
+        a.edit-page-action:hover {
+            background: rgba(255,255,255,0.1);   
+            text-decoration: none;
+        }
     </style>
 </head>
 

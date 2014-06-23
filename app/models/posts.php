@@ -17,6 +17,17 @@ class PostModel
         return json_decode(
             file_get_contents(DATAPATH . 'posts/posts_summary.json'), true);
     } // get posts()
+    
+    /**
+     * Get data for a post, given a slug
+     * @return array of post data
+     */
+    public function get_post_md($post_slug) {
+        $post_path = DATAPATH . "posts/md/$post_slug.json";
+        if (file_exists($post_path)) {
+            return (json_decode(file_get_contents($post_path), true));
+        } // if
+    } // get_post (string)
 
     /**
      * Add a post to the posts "database"

@@ -1,5 +1,4 @@
 <?php
-
     $home_navigation = array (
         'icon' => 'glyphicon glyphicon-home',
         'children' => array (
@@ -27,7 +26,7 @@
             'add-post' => array (
                 'title' => 'Add Post',
             ),
-            'manage-posts' => array (
+            'edit-posts' => array (
                 'title' => 'Edit Posts',
                 'icon' => 'glyphicon glyphicon-pencil'
             )
@@ -40,7 +39,7 @@
                 'title' => 'Add Page',
                 
             ),
-                'manage-pages' => array (
+                'edit-pages' => array (
                 'title' => 'Edit Pages',
                 'icon' => 'glyphicon glyphicon-file'
             )
@@ -89,6 +88,7 @@
  * @param $menu_items, a list of items including href, title, icon
  * @pre $menu_items is not empty
  * @post a menu is printed
+ * @post the link of each inner menu is the same as first item
  * @return none
  */
 function print_menu_list ($list_title, $menu_items) {  
@@ -109,7 +109,7 @@ function print_menu_list ($list_title, $menu_items) {
         } else {
             $icon = '';
         }
-    print_menu_subtitle($list_title, $icon);
+    print_menu_subtitle($list_title, $icon, key($children));
     
     ?><div id='nav-inner-<?php echo strtolower($list_title) ?>' class='nav-inner-menu'<?php if ($is_current === true) { echo " style='display:block'"; } ?>>
     <?php foreach ($children as $href=>$data) {
@@ -159,8 +159,8 @@ function print_menu_item ($href, $title, $icon) {
  * @post a div with subtitle class and subtitle text is output
  * @return none
  */
-function print_menu_subtitle ($subtitle, $icon) { ?>
-    <a href="#" data-menu="<?php echo strtolower($subtitle) ?>" class="nav-menu-title"><?php          if ($icon !== '') { ?>
+function print_menu_subtitle ($subtitle, $icon, $first_link) { ?>
+    <a href="<?php echo $first_link ?>" data-menu="<?php echo strtolower($subtitle) ?>" class="nav-menu-title"><?php          if ($icon !== '') { ?>
         <span class="admin-menu-icon <?php echo $icon ?>"></span>
     <?php } // if
     echo $subtitle ?></a>
@@ -171,7 +171,13 @@ function print_menu_list_divider() {
 }
 
 function get_current_item () {
-    return $_SERVER['REQUEST_URI'];
+    // Go two levels deep!
+    $url = explode('/', $_SERVER['REQUEST_URI']);
+    if (count($url) > 1) {
+        return "/{$url[1]}/{$url[2]}";
+    } else {
+        return $_SERVER['REQUEST_URI'];
+    }
 } // get_current_item()
 ?>
 

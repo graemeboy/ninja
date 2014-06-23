@@ -1,5 +1,11 @@
 <?php
 /*
- * Sensitive configuration information.
+ * Configuration information
  */
+    
+    $config = array (
+        'username' => 'admin',
+        'password' => '',
+        'site_title' => 'Example Site'
+    );
 ?>
