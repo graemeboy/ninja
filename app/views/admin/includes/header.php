@@ -7,11 +7,54 @@
     <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <?php
+    if (!empty($scripts)) {
+        foreach ($scripts as $script_src) {
+            echo "<script src=\"$script_src\" type=\"text/javascript\"></script>";
+        } // foreach
+    } // if
+    if (!empty($styles)) {
+        foreach ($styles as $href) {
+            echo "<link href=\"$href\" type=\"text/css\" rel=\"stylesheet\">";
+        } // foreach
+    } // if
+    ?>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700' rel='stylesheet' type='text/css'>
     <style type="text/css">
         body {
             font-family: 'Open Sans', 'Lucida Grande', helvetica, sans-serif;
             font-weight: lighter; 
+            color: white;
+            background:  linear-gradient(to bottom, #668188 0%,#3c5760  100%);
+        }
+        .form-control {
+            background: rgba(0,0,0,0.15);
+            border: none;
+            color: #fff;
+/*
+            height: 40px;
+            padding: 10px 14px;
+*/
+            border-radius: 0;
+            -webkit-border-radius: 0;
+            -moz-border-radius: 0;
+        }
+        .form-control::-webkit-input-placeholder { /* WebKit browsers */
+            color:    #fff;
+        }
+        .form-control:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+            color:    #fff;
+            opacity:  1;
+        }
+        .form-control::-moz-placeholder { /* Mozilla Firefox 19+ */
+            color:    #fff;
+            opacity:  1;
+        }
+        .form-control:-ms-input-placeholder { /* Internet Explorer 10+ */
+            color:    #fff;
+        }
+        #admin-header-wrap {
+            background:  linear-gradient(to right, #668188 0%,#3c5760  100%);
         }
         #admin-header-wrap {
             background-color: #333;
@@ -34,15 +77,14 @@
             color: #fff;   
         }
         #admin-menu {
-            padding-top: 10px 0;
-            padding-right: 0;
-            padding-left:0; 
+            padding: 0;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        #admin-menu, #admin-header-wrap {
+            box-shadow: 0 0 15px 2px rgba(0, 0, 0, 0.1);   
         }
         .nav-menu-title {
             font-size: 16px;
-        }
-        .nav-menu-title, .nav-menu-list {
-            padding: 10px;
         }
         .nav-menu-item {
             padding: 5px;
@@ -52,17 +94,30 @@
             padding-right:0;   
         }
         .nav-menu-title {
+            display: block;
+            width: 100%;
+            padding: 10px 10px 10px 20px;
         }
         .nav-inner-menu {
-            margin-top: 5px;
+            padding: 0 0 5px 0;
             margin-left: 36px;
             display: none;
         }
         .inner-menu-active {
-            background-color: #2f3130;
+            /*background-color: #2f3130;*/
+            background: rgba(0, 0, 0, 0.1);
         }
         .nav-inner-menu a {
             font-size: 14px   
+        }
+        .nav-inner-menu a:hover, a.nav-menu-title:hover  {
+            text-decoration: none;
+        }
+        a.nav-menu-title:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .nav-menu-item a:hover {
+            color: #daf2fa !important;
         }
         .nav-item-active {
             border-right: 5px solid #5dd680;
@@ -73,6 +128,52 @@
         #dashboard-splash {
             background-color: #fff;
         }
+        h2.page-title, h3.page-title {
+            font-weight: 100;
+        }
+        h2.page-title {
+            margin: 30px;
+            font-size: 34px;   
+        }
+        h3.page-title {
+            margin: 15px 0 15px 30px;
+            font-size: 22px;
+        }
+        textarea.edit-post-content, textarea.edit-page-content {
+            height: 200px;   
+        }
+        .btn {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0;
+            border: none;
+            font-weight: lighter;
+        }
+        
+/*
+ * Mark it up
+ */
+.markItUpHeader ul {
+    padding-left: 0;
+}
+.markItUpHeader ul li	{
+	list-style:none;
+    float:left;
+}
+.markItUpHeader ul li:hover > ul{
+	display:block;
+}
+.markItUpHeader ul .markItUpDropMenu li {
+	margin-right:0px;
+}
+.markItUpHeader ul a {
+	display:block;
+	padding: 10px;
+	margin: 5px;
+    color: #fff;
+    background: rgba(0,0,0,0.2);
+    border-radius: 0;
+    line-height:15px;
+}
     </style>
 </head>
 

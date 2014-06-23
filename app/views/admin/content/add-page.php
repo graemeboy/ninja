@@ -1,5 +1,17 @@
 <?php
     include_once(dirname(__FILE__) . '/../includes/header.php');
-    echo "Hello brave new world.";
+
+    page_title('Add a Page');
+    
+    // Page Title
+    $page_title = '';
+    // Page Content
+    $page_content = '';
+    // Page Tags
+    $page_tags = '';
+
+    // Include the post setup file
+    include_once('includes/page-setup.php');
+
     include_once(dirname(__FILE__) . '/../includes/footer.php');
 ?>

@@ -177,14 +177,14 @@ function get_current_item () {
 
 <script type="text/javascript">
     jQuery(document).ready(function ($) {
-       $('.nav-menu-title').click(function (e) {
+       $('.nav-menu-title').mouseover(function (e) {
         e.preventDefault();
         var menuItems = $(this).attr('data-menu');
         if (!$(this).parent().hasClass('inner-menu-active')) {
             $('.nav-menu-list').removeClass('inner-menu-active');
             $('#nav-inner-' + menuItems).parent().addClass('inner-menu-active');
-            $('.nav-inner-menu').slideUp(200);
-            $('#nav-inner-' + menuItems).slideDown(200);
+            $('.nav-inner-menu').slideUp(300);
+            $('#nav-inner-' + menuItems).slideDown(300);
         }
         
        });

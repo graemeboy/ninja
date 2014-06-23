@@ -7,6 +7,9 @@
  */
 class Admin extends Controller
 {
+    public function __construct () {
+        require_once(BASEPATH . 'admin-functions.php');   
+    }
     /**
      * index
      * The user is requesting the index admin page.
@@ -39,7 +42,14 @@ class Admin extends Controller
     public function add_post($slim) {
         $slim->render('admin/content/add-post.php', array (
             'head_title' => "Add a Post",
-            'meta_title' => 'Add a Post - Admin Dashboard'
+            'meta_title' => 'Add a Post - Admin Dashboard',
+            'scripts' => array (
+                '/public/js/markitup/markdown.js',
+                '/public/js/markitup/jquery.markitup.js'
+            ),
+            'styles' => array (
+                '/public/fontawesome/css/font-awesome.min.css'   
+            )
         ));
     } // add_post (slim Obj)
     
@@ -58,7 +68,7 @@ class Admin extends Controller
     public function add_media($slim) {
         $slim->render('admin/content/add-media.php', array (
             'head_title' => "Add Media",
-            'meta_title' => 'Add Media - Admin Dashboard'
+            'meta_title' => 'Add Media - Admin Dashboard',
         ));
     } // add_page (slim Obj)
     
