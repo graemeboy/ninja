@@ -22,7 +22,7 @@
     </div>
     <div class="col-sm-4">
         <div>
-            <a href="#" class="btn btn-lg btn-success">Publish</a>
+            <a href="#" class="btn btn-lg btn-success"><?php echo $save_button ?></a>
         </div>
     </div>
 </div>

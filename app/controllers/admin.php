@@ -57,6 +57,7 @@ class Admin extends Controller
             'styles' => array (
                 '/public/fontawesome/css/font-awesome.min.css'   
             ),
+            'save_button' => 'Publish',
             'post_data' => $post_data,
         ));
     } // add_post (slim Obj)
@@ -125,6 +126,7 @@ class Admin extends Controller
             'styles' => array (
                 '/public/fontawesome/css/font-awesome.min.css'   
             ),
+            'save_button' => 'Save Post',
         ));
     } // edit_post(slim Obj, string)
     

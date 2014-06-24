@@ -14,8 +14,8 @@ class PostModel
     public function get_posts()
     {
        // Return posts as an array.
-        return json_decode(
-            file_get_contents(DATAPATH . 'posts/posts_summary.json'), true);
+        include_once (DATAPATH . 'posts/posts_summary.php');
+        return $posts_summary;
     } // get posts()
     
     /**
@@ -28,7 +28,19 @@ class PostModel
             return (json_decode(file_get_contents($post_path), true));
         } // if
     } // get_post (string)
-
+    
+    /**
+     * Will append a summary of a post to the post summary data
+     * @pre no existing slug same as one given by post data
+     */
+    function append_summary ($post_data) {
+        $posts_summary = $this->get_posts();
+        $posts_summary[$post_data['slug']] = $post_data;
+        $post_string = var_export($posts_summary, true);
+        $update = '$posts_summary = ' . $post_string . ';';
+        file_put_contents (DATAPATH . 'posts/posts_summary.php', $update);
+    } // append_summary (array)
+    
     /**
      * Add a post to the posts "database"
      */

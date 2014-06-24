@@ -40,8 +40,11 @@
             -moz-border-radius: 0;
         }
         /* Tables */
-        .admin-table th, .admin-table td, label {
+        .admin-table td, label {
             font-weight: lighter;   
+        }
+        .admin-table td a, .admin-table th {
+            font-weight: normal;   
         }
         .table-select {
             width: 30px;

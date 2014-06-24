@@ -10,7 +10,7 @@
  * 
  * @var string
  */
-    echo "Defining version<br/>";
+    //echo "Defining version<br/>";
     define ('VERSION', '0.1');
 
 /*
@@ -24,30 +24,37 @@
 /*
  * Load the config file
  */
-echo "Loading config file<br/>";
+//echo "Loading config file<br/>";
 require_once(APPPATH . 'config/config.php');
+// Set the site title
+    define ('SITETITLE', $config['site_title']);
+// Set the username
+    define ('USENAME', $config['username']);
 
 /*
  * Load the Controller Class
  */
-echo "Loading Controller Class<br/>";
+//echo "Loading Controller Class<br/>";
 require_once(BASEPATH . 'controller.php');
-
+/*
+ * Load functions file
+ */
+require_once(BASEPATH . 'functions.php');
 /*
  * Include the Slim Framework for router
  */
-echo "Loading Slim Framework<br/>";
+//echo "Loading Slim Framework<br/>";
 require_once(BASEPATH . 'includes/Slim/Slim.php');
 
 // Use the Slim framework for URL routing
-echo "Registering Slim autoloader<br/>";
+//echo "Registering Slim autoloader<br/>";
 \Slim\Slim::registerAutoloader();
 /*
  * Include the routes file
  */
-echo "requiring routes from " . APPPATH . "routes/routes.php<br/>";
+//echo "requiring routes from " . APPPATH . "routes/routes.php<br/>";
 require_once( APPPATH . 'routes/routes.php');
-echo "Bootstrap complete<br/>";
+//echo "Bootstrap complete<br/>";
 /*
  * End of file: main.php
  */

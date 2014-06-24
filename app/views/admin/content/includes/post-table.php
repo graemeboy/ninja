@@ -1,3 +1,5 @@
+<div class="container">
+    <div class="col-sm-12">
 <table class="table admin-table">
     <thead>
         <th>Title</th>
@@ -14,7 +16,9 @@
         ?>
     </tbody>
 </table>
-
+</div>
+    </div>
+    
 <?php
     /**
      * function print_post_row
