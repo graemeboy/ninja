@@ -23,10 +23,8 @@ class PostModel
      * @return array of post data
      */
     public function get_post_md($post_slug) {
-        $post_path = DATAPATH . "posts/md/$post_slug.json";
-        if (file_exists($post_path)) {
-            return (json_decode(file_get_contents($post_path), true));
-        } // if
+        include_once (DATAPATH . "posts/md/$post_slug.php");
+        return $post_data;
     } // get_post (string)
     
     /**

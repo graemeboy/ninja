@@ -114,7 +114,6 @@ class Admin extends Controller
     public function edit_post($slim, $slug) {
         $post_model = new PostModel();
         $post_data = $post_model->get_post_md($slug);
-        $post_data['slug'] = $slug;
         $slim->render('admin/content/add-post.php', array (
             'page_title' => "Edit Post",
             'meta_title' => 'Edit Post - Admin Dashboard',

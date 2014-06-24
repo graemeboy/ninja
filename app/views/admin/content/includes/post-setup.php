@@ -77,7 +77,16 @@
                 data: data,
                 complete: function (resp) {
                     $('.page-notification-text').text('Post saved successfully.');
-                    console.log(resp.responseText);  
+                    console.log(resp.responseText);
+                    // If user clicks button again, it saves, not publishes.
+                    $('#save-post-button').text('Save Post');
+                    // User can no longer edit the slug of this post.
+                    $('#edit-post-slug').attr('disabled', 'disabled').css({
+                        'backgroundColor': 'none',
+                        'background': 'rgba(0,0,0,0.1)'
+                    });
+                    // No more automatic updates for slug
+                    setSlug = false;
                 },
                 progress: function (evt) {
                     if (evt.lengthComputable) {
@@ -87,6 +96,10 @@
                     } // else
                 } // progress
             })
+        });
+        
+        $('#edit-post-content, #edit-post-title, #edit-post-tags, #edit-post-slug').keyup(function () {
+           $('.page-notification').fadeOut(); 
         });
 
         (function addXhrProgressEvent($) {
