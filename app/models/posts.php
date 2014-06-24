@@ -30,17 +30,38 @@ class PostModel
     } // get_post (string)
     
     /**
-     * Will append a summary of a post to the post summary data
-     * @pre no existing slug same as one given by post data
+     * Will append or update post summaries given a new or updated post summary
+     * @pre if appending, no existing slug same as one given by post data
      */
-    function append_summary ($post_data) {
+    function update_summary ($post_data) {
         $posts_summary = $this->get_posts();
         $posts_summary[$post_data['slug']] = $post_data;
         $post_string = var_export($posts_summary, true);
-        $update = '$posts_summary = ' . $post_string . ';';
+        $update = '<?php $posts_summary = ' . $post_string . '; ?>';
         file_put_contents (DATAPATH . 'posts/posts_summary.php', $update);
     } // append_summary (array)
     
+    /**
+     * function save_markdown
+     * Puts post data as an array in to a php file with the same of the slug
+     */
+    function save_markdown($post_data) {
+        $slug = $post_data['slug'];
+        $post_string = var_export($post_data, true);
+        $data = '<?php $post_data = ' . $post_string . '; ?>';
+        file_put_contents (DATAPATH . "posts/md/$slug.php", $data);
+    } // save_markdown (array)
+    
+    /**
+     * function save_html
+     * Puts post data as an array in to a php file with the same of the slug
+     */
+    function save_html($post_data) {
+        $slug = $post_data['slug'];
+        $post_string = var_export($post_data, true);
+        $data = '<?php $post_data = ' . $post_string . '; ?>';
+        file_put_contents (DATAPATH . "posts/html/$slug.php", $data);
+    } // save_html (array)
     /**
      * Add a post to the posts "database"
      */

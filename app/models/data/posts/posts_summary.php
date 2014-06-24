@@ -1,4 +1,4 @@
-$posts_summary = array (
+<?php $posts_summary = array (
   'hello' => 
   array (
     'title' => 'Hello World',
@@ -23,4 +23,4 @@ hi there
 
 * list item',
   ),
-);
+); ?>

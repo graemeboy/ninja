@@ -54,27 +54,29 @@ function save_post($post_data) {
     
     // Forget the action now.
     unset($post_data['action']);
+    $post_data['last_edited'] = date("Y-m-d H:i:s");
     
     // Save summary data.
     $summary_data = $post_data;
-    $post_model->append_summary($summary_data);
+    unset($summary_data['content']);
+    $post_model->update_summary($summary_data);
     
     // Save markdown data.
     $md_data = $post_data;
     // Save the date last edited.
-    $md_data['last_edited'] = date("Y-m-d H:i:s");
     // Save tags as array.
     $md_data['tags'] = explode(',', $md_data['tags']);
     // Trim  each tag.
     foreach ($md_data['tags'] as $index=>$tag) {
         $md_data['tags'][$index] = trim($tag);
     } // foreach
-    //$post_model->save_markdown($md_data);
+    $post_model->save_markdown($md_data);
     
     // Save HTML summary data.
     $html_data = $post_data;
     $html_data['content'] = convert_md_to_html($post_data['content']);
-    print_r($html_data);
+    $post_model->save_html($html_data);
+    echo "success";
 } // save_post(array)
 
 /**
