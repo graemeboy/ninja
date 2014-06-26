@@ -2,6 +2,7 @@
     <div class="col-sm-8">
         <div class="admin-widget">
             <form role="form">
+                <input type="hidden" name="slug-original" value="<?php echo $slug ?>" />
                 <div class="form-group">
                     <label for="edit-page-title" class="sr-only">page Title</label>
                     <input type="text" class="form-control input-lg edit-page-title" placeholder="Enter title here" id="edit-page-title" value="<?php echo $title ?>" />

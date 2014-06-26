@@ -19,6 +19,23 @@ class PostModel
     } // get posts()
     
     /**
+     * function delete_post
+     * Takes a post slug and removes it from summary, 
+     *  deletes the markdown and html files.
+     */
+    function delete_post($post_slug) {
+        // Delete post from summary
+        include_once (DATAPATH . 'posts/posts_summary.php');
+        if (!empty($post_summary[$post_slug])) {
+            unset($post_summary[$post_slug]);
+        } // if
+        save_summary($posts_summary);
+        // Remove the markdown files
+        unlink(DATAPATH . "posts/md/$post_slug.php");
+        unline(DATAPATH . "posts/html/$post_slug.php");
+    } // delete_post (string)
+    
+    /**
      * Get data for a post, given a slug
      * @return array of post data
      */
@@ -34,10 +51,18 @@ class PostModel
     function update_summary ($post_data) {
         $posts_summary = $this->get_posts();
         $posts_summary[$post_data['slug']] = $post_data;
+        save_summary($posts_summary);
+    } // append_summary (array)
+    
+    /**
+     * Takes an array and saves the data to the post summary file.
+     * @param $post_summary, an array of the summaries of each post.
+     */
+    function save_summary ($posts_summary) {
         $post_string = var_export($posts_summary, true);
         $update = '<?php $posts_summary = ' . $post_string . '; ?>';
         file_put_contents (DATAPATH . 'posts/posts_summary.php', $update);
-    } // append_summary (array)
+    } // save_summary (array)
     
     /**
      * function save_markdown
@@ -60,22 +85,40 @@ class PostModel
         $data = '<?php $post_data = ' . $post_string . '; ?>';
         file_put_contents (DATAPATH . "posts/html/$slug.php", $data);
     } // save_html (array)
+    
     /**
      * Add a post to the posts "database"
      */
-    public function add_post ($post_data)
+    public function save_post ($post_data)
     {
+        /*
+         * If an existing post is being edited, then that post ought
+         * to be removed before the new data are added.
+         */
+        if (!empty($post_data['slug-original'] && 
+                   trim ($post_data['slug-original']) !== '' )) {
+            $this->delete_post($post_data['slug-original']);
+        } // if
         
-    } // add_post(array)
+        // Save summary data.
+        $summary_data = $post_data;
+        unset($summary_data['content']);
+        $this->update_summary($summary_data);
 
-    /**
-     * Delete a song in the database
-     * Please note: this is just an example! In a real application you would not simply let everybody
-     * add/update/delete stuff!
-     * @param int $song_id Id of song
-     */
-    public function delete_post($post_id)
-    {
-        
-    } // delete_post(int)
+        // Save markdown data.
+        $md_data = $post_data;
+        // Save the date last edited.
+        // Save tags as array.
+        $md_data['tags'] = explode(',', $md_data['tags']);
+        // Trim  each tag.
+        foreach ($md_data['tags'] as $index=>$tag) {
+            $md_data['tags'][$index] = trim($tag);
+        } // foreach
+        $post_model->$this->save_markdown($md_data);
+
+        // Save HTML summary data.
+        $html_data = $post_data;
+        $html_data['content'] = convert_md_to_html($post_data['content']);
+        $post_model->$this->save_html($html_data);
+    } // save_post(array)
 } // class PostModel

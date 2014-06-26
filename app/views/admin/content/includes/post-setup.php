@@ -2,6 +2,7 @@
     <div class="col-sm-8">
         <div class="admin-widget">
             <form id="save_post_form" role="form">
+                <input type="hidden" name="slug-original" id="slug-original" value="<?php echo $slug ?>" />
                 <div class="form-group">
                     <label for="edit-post-title" class="sr-only">Post Title</label>
                     <input type="text" class="form-control input-lg edit-post-title" placeholder="Enter title here" id="edit-post-title" name="title" value="<?php echo $title ?>" />
@@ -80,11 +81,12 @@
                     console.log(resp.responseText);
                     // If user clicks button again, it saves, not publishes.
                     $('#save-post-button').text('Save Post');
+                    $('#slug-original').val($('#edit-post-slug').val());
                     // User can no longer edit the slug of this post.
-                    $('#edit-post-slug').attr('disabled', 'disabled').css({
-                        'backgroundColor': 'none',
-                        'background': 'rgba(0,0,0,0.1)'
-                    });
+//                    $('#edit-post-slug').prop('readonly', true).css({
+//                        'backgroundColor': 'none',
+//                        'background': 'rgba(0,0,0,0.1)'
+//                    });
                     // No more automatic updates for slug
                     setSlug = false;
                 },
