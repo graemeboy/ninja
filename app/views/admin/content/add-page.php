@@ -1,7 +1,7 @@
 <?php
     include_once(dirname(__FILE__) . '/../includes/header.php');
 
-    page_title('Add a Page');
+    page_title('Add a Page', 'dashicons dashicons-welcome-add-page');
     
     // Page Title
     $page_title = '';

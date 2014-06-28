@@ -5,9 +5,13 @@
         <?php echo $meta_title ?>
     </title>
     <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <link href="/public/dashicons/css/dashicons.css" rel="stylesheet">
+    
+    <script src="/public/js/jQuery/jquery.min.js"></script>
+    <script src="/public/js/jQuery/jquery.migrate.min.js"></script>
+<!--    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700' rel='stylesheet' type='text/css'>-->
     <?php
+    // Load any other scripts that a particular view requires.
     if (!empty($scripts)) {
         foreach ($scripts as $script_src) {
             echo "<script src=\"$script_src\" type=\"text/javascript\"></script>";
@@ -19,10 +23,11 @@
         } // foreach
     } // if
     ?>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700' rel='stylesheet' type='text/css'>
+    
     <style type="text/css">
         body {
-            font-family: 'Open Sans', 'Lucida Grande', helvetica, sans-serif;
+/*            font-family: 'Open Sans', 'Lucida Grande', helvetica, sans-serif;*/
+            font-family: sans-serif;
             font-weight: lighter; 
             color: white;
             background:  linear-gradient(to bottom, #668188 0%,#3c5760  100%);
@@ -136,7 +141,7 @@
             text-decoration: none;
         }
         a.nav-menu-title:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.1);
         }
         .nav-menu-item a:hover {
             color: #daf2fa !important;
@@ -209,12 +214,9 @@
             font-size: 22px;
             margin-bottom: 5px;
         }
-        a.edit-page-action i {
-            padding-right: 5px
-        }
         a.edit-page-action {
-            display: block;
-            padding: 10px 0;
+            display:inline-block;
+            padding:10px;
             text-align:center
         }
         td.edit-post-actions {
@@ -234,7 +236,7 @@
                 <span id="admin-head-title"><?php echo SITETITLE ?></span>
             </div>
             <div id="admin-header-right" class="container-fluid pull-right">
-                <a href="" class="admin-logout-link">Logout</a>
+                <a href="" class="admin-logout-link"><i class="dashicons dashicons-migrate" style="font-size:1.3em;height:auto;width:auto;"></i> Logout</a>
             </div>
             <div class="clearfix"></div>
         </div>

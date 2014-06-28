@@ -56,7 +56,7 @@
                     keywords.replace(/ /g, '-')));
             } // if
             if (setTags === true) {
-                $('#edit-post-tags').val(keywords.replace(/ /g, ','));
+                $('#edit-post-tags').val(keywords.replace(/ /g, ', '));
             } // if
         });
         $('#edit-post-tags').keyup(function () {
@@ -68,6 +68,11 @@
         
         $('#save-post-button').click(function (e) {
            e.preventDefault();
+            var contentValid = false;
+            if ((contentValid = validatePostContent()) !== true) {
+                alert(contentValid);
+                return false;
+            } // if
             $('.page-notification-text').text('Saving post...');
             $('.page-notification').show();
             var data = $('form#save_post_form').serialize();
@@ -82,11 +87,6 @@
                     // If user clicks button again, it saves, not publishes.
                     $('#save-post-button').text('Save Post');
                     $('#slug-original').val($('#edit-post-slug').val());
-                    // User can no longer edit the slug of this post.
-//                    $('#edit-post-slug').prop('readonly', true).css({
-//                        'backgroundColor': 'none',
-//                        'background': 'rgba(0,0,0,0.1)'
-//                    });
                     // No more automatic updates for slug
                     setSlug = false;
                 },
@@ -99,6 +99,17 @@
                 } // progress
             })
         });
+        
+        /**
+         * Boolean validatePostContent
+         * Returns true if the post is okay to save, else returns an error message.
+         */
+        function validatePostContent () {
+            if ($('#edit-post-slug').val() === '') {
+                return 'The slug must contain at least some characters!';
+            }
+            return true;
+        } // validatePostContent ()
         
         $('#edit-post-content, #edit-post-title, #edit-post-tags, #edit-post-slug').keyup(function () {
            $('.page-notification').fadeOut(); 

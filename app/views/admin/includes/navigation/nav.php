@@ -1,6 +1,6 @@
 <?php
     $home_navigation = array (
-        'icon' => 'glyphicon glyphicon-home',
+        'icon' => 'dashicons dashicons-admin-home',
         'children' => array (
             'dashboard' => array (
                 'title' => 'Dashboard',
@@ -10,8 +10,16 @@
             ),
         )
     );
+    $appearance_navigation = array (
+        'icon' => 'dashicons dashicons-admin-appearance',
+        'children' => array (
+            'appearance' => array (
+                'title' => 'Theme and Style',
+            ),
+        )
+    );
     $settings_navigation = array (
-        'icon' => 'glyphicon glyphicon-cog',
+        'icon' => 'dashicons dashicons-admin-settings',
         'children' => array (
             'settings-site' => array (
                 'title' => 'Site Settings',
@@ -21,7 +29,7 @@
     // Define menu items for adding posts and pages
     
     $core_navigation_posts = array (
-        'icon' => 'glyphicon glyphicon-pencil',
+        'icon' => 'dashicons dashicons-admin-post',
         'children' => array (
             'add-post' => array (
                 'title' => 'Add Post',
@@ -33,7 +41,7 @@
         )
     ); 
     $core_navigation_pages = array (
-        'icon' => 'glyphicon glyphicon-file',
+        'icon' => 'dashicons dashicons-admin-page',
         'children' => array (
                 'add-page' => array (
                 'title' => 'Add Page',
@@ -46,9 +54,9 @@
         )
     );
     $core_navigation_media = array (
-        'icon' => 'glyphicon glyphicon-picture',
+        'icon' => 'dashicons dashicons-admin-media',
         'children' => array (
-                'add-media' => array (
+                'appera-media' => array (
                 'title' => 'Add Media',
             ),
                 'manage-media' => array (
@@ -75,6 +83,9 @@
     } // if
     if (!empty($core_navigation_media)) {
         print_menu_list("Media", $core_navigation_media);
+    } // if
+    if (!empty($appearance_navigation)) {
+        print_menu_list("Appearance", $appearance_navigation);
     } // if
     if (!empty($settings_navigation)) {
         print_menu_list("Settings", $settings_navigation);
@@ -183,16 +194,31 @@ function get_current_item () {
 
 <script type="text/javascript">
     jQuery(document).ready(function ($) {
-       $('.nav-menu-title').mouseover(function (e) {
-        e.preventDefault();
-        var menuItems = $(this).attr('data-menu');
-        if (!$(this).parent().hasClass('inner-menu-active')) {
+        var menuTimeout,self;
+        $('.nav-menu-title').mouseover(function () {
+            // If not hovering over the currently active menu.
+            if (!$(this).parent().hasClass('inner-menu-active')) {
+                // Wait a moment before showing inner.
+                self = $(this);
+                if (!menuTimeout) {
+                    menuTimeout = window.setTimeout(function() {
+                        menuTimeout = null;
+                        // Detect if still hovering
+                        if (self.is(":hover")) {
+                            // Only now, hide other menus and display new one.
+                            showInner(self.attr('data-menu'));
+                        } // if
+                    }, 250);
+                } // if
+            } // if
+        });
+
+        function showInner(menuItems) {
             $('.nav-menu-list').removeClass('inner-menu-active');
-            $('#nav-inner-' + menuItems).parent().addClass('inner-menu-active');
+            $('#nav-inner-' + menuItems).parent()
+                .addClass('inner-menu-active');
             $('.nav-inner-menu').slideUp(300);
             $('#nav-inner-' + menuItems).slideDown(300);
-        }
-        
-       });
+        } // showInner ()
     });
 </script>

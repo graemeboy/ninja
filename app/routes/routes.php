@@ -18,8 +18,8 @@ require_once(APPPATH . 'controllers/front.php');
 require_once(APPPATH . 'controllers/admin.php');
 
 // Models
-require_once(APPPATH . 'models/posts.php');
-require_once(APPPATH . 'models/pages.php');
+require_once(APPPATH . 'models/PostModel.php');
+require_once(APPPATH . 'models/PageModel.php');
 
 //echo "Initializing admin controller<br/>";
 
@@ -36,6 +36,8 @@ $router->get('/', function () use ($front) {
     
     $front->index();
 });
+
+//echo "define ajax";
 /*
  * Static AJAX Admin Routes
  */
@@ -49,48 +51,23 @@ $router->post('/admin/ajax', function () use ($router) {
     echo $resp;
 });
 
-function save_post($post_data) {
+function delete_post($post_slug) {
     $post_model = new PostModel();
+    $post_model->delete_post($post_slug);
     
+} // delete_post (string)
+
+function save_post($postData) {
+    print_r($postData);
+    $postModel = new PostModel();
+    echo "New model!";
     // Forget the action now.
-    unset($post_data['action']);
-    $post_data['last_edited'] = date("Y-m-d H:i:s");
-    
-    // Save summary data.
-    $summary_data = $post_data;
-    unset($summary_data['content']);
-    $post_model->update_summary($summary_data);
-    
-    // Save markdown data.
-    $md_data = $post_data;
-    // Save the date last edited.
-    // Save tags as array.
-    $md_data['tags'] = explode(',', $md_data['tags']);
-    // Trim  each tag.
-    foreach ($md_data['tags'] as $index=>$tag) {
-        $md_data['tags'][$index] = trim($tag);
-    } // foreach
-    $post_model->save_markdown($md_data);
-    
-    // Save HTML summary data.
-    $html_data = $post_data;
-    $html_data['content'] = convert_md_to_html($post_data['content']);
-    $post_model->save_html($html_data);
+    unset($postData['action']);
+    $postData['last_edited'] = date("Y-m-d H:i:s");
+    $postModel->savePost($postData);
     echo "success";
 } // save_post(array)
-
-/**
- * function convert_md_to_html
- * Converts markdown content as string to html
- * @param $md, markdown string
- */
-function convert_md_to_html($md) {
-    require_once(BASEPATH . 'includes/Parsedown/Parsedown.php');
-    $Parsedown = new Parsedown();
-    // Return the parsed $md as HTML
-    return $Parsedown->text($md);
-} // convert_md_to_html(string)
-
+//echo "define static";
 /*
  * ------------------------------------
  * Define Static Admin Routes
@@ -107,49 +84,56 @@ $router->get('/admin/dashboard', function () use ($admin, $router) {
 });
 // Add Posts and Pages and Media
 $router->get('/admin/add-post', function () use ($admin, $router) {
-    $admin->add_post($router);
+    $admin->addPost($router);
 });
 $router->get('/admin/add-page', function () use ($admin, $router) {
-    $admin->add_page($router);
+    $admin->addPage($router);
 });
 $router->get('/admin/add-media', function () use ($admin, $router) {
-    $admin->add_media($router);
+    $admin->addMedia($router);
 });
 // Manage Posts, Pages, and Media
 $router->get('/admin/edit-posts', function () use ($admin, $router) {
-    $admin->manage_posts($router);
+    $admin->managePosts($router);
 });
 $router->get('/admin/edit-pages', function () use ($admin, $router) {
-    $admin->manage_posts($router);
+    $admin->managePages($router);
 });
 $router->get('/admin/edit-media', function () use ($admin, $router) {
-    $admin->manage_media($router);
+    $admin->manageMedia($router);
 });
 $router->get('/admin/edit-posts/:slug', function ($slug) use ($admin, $router) {
-    $admin->edit_post($router, $slug);
+    $admin->editPost($router, $slug);
 });
 // Settings Pages
 $router->get('/admin/settings-site', function () use ($admin, $router) {
-    $admin->settings_site($router);
+    $admin->settingsSite($router);
 });
+// Appearance Settings - Theme and Styles
+$router->get('/admin/appearance', function () use ($admin, $router) {
+    $admin->appearance($router);
+});
+$router->get('/admin/delete-post/:slug', function ($slug) use ($admin, $router) {
+    $admin->deletePost($slug, $router);
+});
+
+$router->get('/admin/view-post/:slug', function ($slug) use ($router) {
+   $router->redirect("/$slug");
+});
+
 // Dynamic Routes
 // Posts or Pages
 $router->get('/:slug', function ($slug) use ($front, $router) {
-    // Check to see if it is a posts   
-    //echo "Checking for post with slug: $slug in " . DATAPATH. "posts/posts_summary.json<br/>";
-    
-    // Check Posts
     $PostModel = new PostModel();
-    $posts = $PostModel->get_posts();
-    if (!empty($posts[$slug])) {
-        //echo "Post found.<br/>";
-        echo "<h3>{$posts[$slug]['title']}</h3>";
+    // Check if post exists.
+    if ($PostModel->isPost($slug)) {
+        $front->post($slug, $router);
     } else {
         // Check Pages
         $PageModel = new PageModel();
         $pages = $PageModel->get_pages();
         if (!empty($pages[$slug])) {
-            
+            // Found a page with this slug.
         } else {
             // No post or pages found with that slug.
             // Return 404
