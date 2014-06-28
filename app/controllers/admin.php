@@ -142,8 +142,8 @@ class Admin extends Controller
      */
     function appearance ($slim) {
         $slim->render('admin/appearance.php', array (
-            'page_title' => "Theme and Style",
-            'meta_title' => 'Theme and Style - Admin Dashboard'
+            'page_title' => "Layout and Style",
+            'meta_title' => "Layout and Style - Admin Dashboard"
         ));
     } // appearance (slim Obj)
     
