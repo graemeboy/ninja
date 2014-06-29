@@ -1,4 +1,4 @@
-<?php
+<?php namespace ninja\Models;
 /**
  * ContentModel
  *
@@ -11,7 +11,7 @@
  * This abstract class defines the common functions, while extended classes are intended to set
  * different directory paths for data, and provide a minimal number of idiosyncratic functions.
  */
-abstract class ContentModel {
+abstract class Content {
 
     // The path for the summary data for each post or page.
     protected $summaryPath;
@@ -247,7 +247,7 @@ abstract class ContentModel {
      */
     function deleteHtml( $slug ) {
         // HTML data is stored in an html file.
-        $filename = $this->$htmlPath . "$slug.html";
+        $filename = $this->htmlPath . "$slug.html";
         if ( file_exists( $filename ) ) {
             unlink( $filename );
         } // if

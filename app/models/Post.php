@@ -1,8 +1,9 @@
-<?php
+<?php namespace ninja\Models;
 
-require_once 'Content.php';
+require_once('Content.php');
+use ninja\Models\Content as Content;
 
-class Post extends ContentModel
+class Post extends Content
 {
     /*-------------
      * Fields
@@ -18,14 +19,9 @@ class Post extends ContentModel
      *-------------
      */
     function __construct() {
-        // Call the parent constructor
-        parent::__construct();
-
         $this->setMarkdownPath( DATAPATH . self::MARKDOWN_PATH );
         $this->setHtmlPath( DATAPATH . self::HTML_PATH );
         $this->setSummaryPath( DATAPATH . self::SUMMARY_PATH );
-
-
     } // __construct ()
 
     /* -----------------
