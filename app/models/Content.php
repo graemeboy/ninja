@@ -21,7 +21,7 @@ abstract class ContentModel {
     protected $markdownPath;
 
     /**
-     * function getAll
+     * getAll
      * Return a PHP array of all the items of the current object's content type.
      *
      * @param string  $summaryPath, the directory for content summaries.
@@ -40,7 +40,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function getSummary
+     * getSummary
      * Returns a PHP array of the summary of a single item of content, e.g. post.
      *
      * @param string  $slug, the unique identifier for content.
@@ -52,7 +52,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function getMarkdown
+     * getMarkdown
      * Given a slug for a post or page, return the markdown content.
      *
      * @param string  slug, the slug identifying the file needed.
@@ -66,7 +66,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function getHtml
+     * getHtml
      * Returns the HTML content for an item of content.
      *
      * @param string  $slug, the unique identifier for the content.
@@ -80,7 +80,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function getMarkDownPath
+     * getMarkDownPath
      *
      * @return string, the path to the markdown directory
      */
@@ -89,7 +89,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function getHtmlPath
+     * getHtmlPath
      *
      * @return string, the path to the HTML directory
      */
@@ -98,7 +98,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function getSummaryPath
+     * getSummaryPath
      *
      * @return string, the path to the summary directory
      */
@@ -108,36 +108,36 @@ abstract class ContentModel {
 
 
     /**
-     * function setHTMLPath
+     * setHTMLPath
      *
-     * @param string $htmlPath, the path to the HTML content
+     * @param string  $htmlPath, the path to the HTML content
      */
     function setHtmlPath( $htmlPath ) {
         $this->htmlPath = $htmlPath;
     }
 
     /**
-     * function setMarkdownPath
+     * setMarkdownPath
      *
-     * @param string $markdownPath, the path to the markdown content
+     * @param string  $markdownPath, the path to the markdown content
      */
     function setMarkdownPath( $markdownPath ) {
         $this->markdownPath = $markdownPath;
     }
 
     /**
-     * function setSummaryPath
+     * setSummaryPath
      *
-     * @param string $summaryPath, the path to the content summaries
+     * @param string  $summaryPath, the path to the content summaries
      */
     function setSummaryPath( $summaryPath ) {
         $this->summaryPath = $summaryPath;
     }
 
     /**
-     * function appendSummary
+     * appendSummary
      *
-     * @param array $postData, contains the summary data for the new content.
+     * @param array   $postData, contains the summary data for the new content.
      * @post the summary data for the content is appended to the data structure for posts.
      * @return void
      */
@@ -145,7 +145,7 @@ abstract class ContentModel {
         // Separate string of tags into array, using ',' as delineator.
         $tags = explode( ',', $postData['tags'] );
         // Remove any whitespace around each tag.
-        $postData['tags'] = trimTags($tags);
+        $postData['tags'] = trimTags( $tags );
         // Get all of the posts as assoc array
         $posts = $this->getAll();
         // Set the array with item slug to the given post data
@@ -156,9 +156,10 @@ abstract class ContentModel {
 
 
     /**
-     * function save
+     * save
      * Saves the post content to the appropriate structures and directories.
-     * @param array $postData, all data for the post.
+     *
+     * @param array   $postData, all data for the post.
      */
     function save( $contentData ) {
         $slug = $contentData['slug'];
@@ -186,6 +187,7 @@ abstract class ContentModel {
     }
 
     /**
+     * saveDataToFile
      * Takes a PHP array and saves it as an appropriate data structure
      * to the file.
      *
@@ -197,7 +199,7 @@ abstract class ContentModel {
     } // save_summary (array)
 
     /**
-     * function saveHTMLToFile
+     * saveHTMLToFile
      *
      * @param unknown $htmlContent, string of html
      * @param unknown $slug,        string
@@ -208,7 +210,7 @@ abstract class ContentModel {
     } // saveHTMLToFile (string, string)
 
     /**
-     * function saveMarkdownToFile
+     * saveMarkdownToFile
      *
      * @param unknown $markdown, string of markdown text
      * @param unknown $slug,     string
@@ -220,7 +222,7 @@ abstract class ContentModel {
 
 
     /**
-     * function delete
+     * delete
      * Removes all traces of the content.
      *
      * @param string  $slug the unique identifier of the content.
@@ -238,7 +240,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function deleteHtml
+     * deleteHtml
      * Unlinks the html page for a given content.
      *
      * @param string  $slug the unique identifier of the content.
@@ -252,7 +254,7 @@ abstract class ContentModel {
     }
 
     /**
-     * function deletMarkdown
+     * deletMarkdown
      * Unlinks the markdown file for a given content.
      *
      * @param string  $slug the unique identifier of the content.
