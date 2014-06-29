@@ -13,31 +13,12 @@
  */
 abstract class ContentModel {
 
-    /* -----------------
-     *  Fields
-     * -----------------
-     */
-
     // The path for the summary data for each post or page.
     protected $summaryPath;
     // The path in which HTML content is stored for quick access on the frontend.
     protected $htmlPath;
     // The path in which markdown content is store for access when editing in the admin area.
     protected $markdownPath;
-
-    /* -----------------
-     *  Constructors
-     * -----------------
-     */
-
-    function __construct() {
-
-    } // __construct()
-
-    /* -----------------
-     *  Observers
-     * -----------------
-     */
 
     /**
      * function getAll
@@ -125,11 +106,6 @@ abstract class ContentModel {
         return $this->summaryPath;
     }
 
-
-    /* ------------
-     *  Mutators
-     * ------------
-     */
 
     /**
      * function setHTMLPath
