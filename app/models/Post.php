@@ -38,7 +38,7 @@ class Post extends Content
      */
     public function isPost( $slug ) {
         // Get all post summaries (the smallest sets of data about posts)
-        $posts = $this->getAllPosts();
+        $posts = $this->getAll();
         // Return boolean if a post exists with this slug.
         return !empty( $posts[$slug] );
     } // isPost(string)

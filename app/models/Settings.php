@@ -4,7 +4,7 @@
  *
  * Includes function to get and update user, appearance, and security settings.
  */
-class SettingsModel {
+class Settings {
 
 	/**
 	 * Default settings for the appearance.
@@ -19,7 +19,7 @@ class SettingsModel {
 
 	/**
 	 * Set the path to the configuration file relative to app path.
-	 * 
+	 *
 	 * @access const
 	 * @var string address of configuration file.
 	 */
@@ -35,7 +35,7 @@ class SettingsModel {
 
 	function __construct() {
 		// Set the path to the appearance configuration file.
-		static::$appearanceConfigPath = APPPATH . APPEARANCE_CONFIG;
+		$this->setAppearancePath( APPPATH . self::APPEARANCE_CONFIG );
 	}
 
 	/**
@@ -44,10 +44,25 @@ class SettingsModel {
 	 * Request the appearance settings from the appearance file, and return them
 	 * in a PHP array.
 	 *
-	 * @return array of requested settings.
+	 * @return array of requested settings if exists, else empty array.
 	 */
 	function getAppearanceSettings() {
-		$json_settings = file_get_contents( static::$appearanceConfigPath );
+		$jsonData = json_decode( file_get_contents( static::$appearanceConfigPath ), true );
+		if (!empty($jsonData)) {
+			return $jsonData;
+		} else {
+			// Return an empty arary.
+			return array();
+		}
+	}
+
+	/**
+	 * Set the full path to the appearance configuration file.
+	 *
+	 * @param string  $path the full path to appearance config file.
+	 */
+	function setAppearancePath( $path ) {
+		static::$appearanceConfigPath = $path;
 	}
 
 	/**
@@ -57,10 +72,15 @@ class SettingsModel {
 	 * configuration file, setting the layout configuration to this string.
 	 *
 	 * @param string  $layout, a string identifying the new layout option.
+	 * @return void
 	 */
 	function setLayout( $layout ) {
-
-
+		// Get the current appearance settings.
+		$settings = $this->getAppearanceSettings();
+		// Set the layout variable to the new layout.
+		$settings['layout'] = $layout;
+		// Save the new settings.
+		$this->saveSettings( $settings );
 	}
 
 	/**
@@ -70,21 +90,32 @@ class SettingsModel {
 	 * setting the style configuration to this new option. This will have the effect of loading
 	 * the a stylesheet related to this style id on the website frontend.
 	 *
-	 * @param string  $style, a string identifying the css file name (does not include CSS extension).
-	 * @return void
+	 * @param  string  $style, a string identifying the css file name (does not include CSS extension).
+	 * @return  void
 	 */
 	function setStyle( $style ) {
-
-
+		// Get the current appearance settings.
+		$settings = $this->getAppearanceSettings();
+		// Set the layout variable to the new layout.
+		$settings['style'] = $style;
+		// Save the new settings.
+		$this->saveSettings( $settings );
 	}
 
-	function restoreDefaults() {
-
-
+	/**
+	 * Save the appearance settings.
+	 * 
+	 * Take in a PHP array of settings, convert to appropriate data structure,
+	 * and save the settings using the appearance configuration path.
+	 * @param  array $settings a PHP array of the new settings.
+	 * @return  void
+	 */
+	function saveSettings( $settings ) {
+		// Encode the settings to JSON format.
+		$settings = json_encode( $settings );
+		// Update the appearance configuration file.
+		file_put_contents( static::$appearanceConfigPath, $settings );
 	}
-
-
-
 }
 
 ?>
