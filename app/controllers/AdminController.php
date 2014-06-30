@@ -1,6 +1,11 @@
-<?php
+<?php namespace ninja\Controllers;
+
+use ninja\Models\Post as Post;
+use ninja\Models\Settings as Settings;
+
 require_once BASEPATH . 'admin-functions.php';
 require_once APPPATH . 'models/Post.php';
+require_once APPPATH . 'models/Settings.php';
 
 /**
  * Class Admin
@@ -9,22 +14,95 @@ require_once APPPATH . 'models/Post.php';
  */
 class AdminController extends Controller
 {
+    /**
+     * The model for posts.
+     * 
+     * @access public static
+     * @var  string
+     */
     public static $postModel;
 
     public function __construct() {
         static::$postModel = new Post();
-        echo "Has post model";
     }
     /**
-     * index
-     * The user is requesting the index admin page.
-     * If the user is logged in, show the dashboard,
-     * otherwise, redirect to a log in page.
+     * The URL requested by "/admin" or "/admin/"
+     * 
+     * Because no specific page in the admin is requested, 
+     * redirect the user to the dashboard.
+     * 
+     * @param Object @app the Slim framework app that provides redirect.
      */
-    public function index() {
-        echo 'Welcome to the admin index.';
-
+    public function index( $app ) {
+        // If logged in, redirect to the dashboard.
+        $app->redirect( '/admin/dashboard' );
     }
+
+    /**
+     * 
+     */
+    function ajaxRequest( $postData ) {
+        echo "received post";
+        $action = "admin_ajax_" . $postData[ 'action' ];
+        // Check if this ajax method exists
+        if ( method_exists( $this, $action ) ) {
+            unset( $postData['action'] );
+            print_r( $postData );
+            $resp = call_user_func_array( array( $this, $action ), array( $postData ) );
+        } else {
+            $resp = 'incorrect action: ' . $action;
+        }
+        echo $resp;
+    }
+
+    /**
+     * admin_ajax_delete
+     *
+     * @param string  $slug
+     * @return [type]            [description]
+     */
+    function admin_ajax_delete( $slug ) {
+        static::$postModel->delete( $slug );
+    }
+
+    function admin_ajax_save( $postData ) {
+        // Add current time as last updated.
+        $postData['last_edited'] = date( "Y-m-d H:i:s" );
+        // Save the post data.
+        static::$postModel->save( $postData );
+        echo "success";
+    }
+
+    /**
+     * Update the site's layout settings.
+     *
+     * Receive data from the admin frontend that tells the server which layout
+     * option to update to, and then set that option in the configuration file
+     * for the site's appearance.
+     *
+     * @param array   $data contains the new layout id
+     * @return void
+     */
+    function admin_ajax_update_layout( $data ) {
+        print_r( $data );
+        echo "success";
+    }
+
+    /**
+     * Update the site's style settings.
+     *
+     * Receive data from the admin frontend that tells the server which stylesheet
+     * should be rendered when displaying the frontend of the website. Update those
+     * options in the site's configuration file.
+     *
+     * @param array   $data contains the new style id
+     * @return void
+     */
+    function admin_ajax_update_style( $data ) {
+        print_r( $data );
+        echo "success";
+    }
+
 
     /**
      * Render the Admin Dashboard
@@ -90,10 +168,7 @@ class AdminController extends Controller
      *-------------------------------
      */
     public function managePosts( $slim ) {
-        echo "init post";
-
         $posts = static::$postModel->getAll();
-        echo "got posts";
 
         $slim->render( 'admin/content/manage-posts.php', array (
                 'page_title' => "Manage Posts",
@@ -122,7 +197,7 @@ class AdminController extends Controller
     public function editPost( $slim, $slug ) {
         echo "editing post";
         $postData = static::$postModel->getSummary( $slug );
-        print_r($postData);
+        print_r( $postData );
         $postMarkdown = static::$postModel->getMarkdown( $slug );
         echo $postMarkdown;
         $postData['content'] = $postMarkdown;
@@ -148,7 +223,6 @@ class AdminController extends Controller
      * @param slim    Obj
      */
     function appearance( $slim ) {
-        echo "Rendering page";
         $slim->render( 'admin/appearance.php', array (
                 'page_title' => "Layout and Style",
                 'meta_title' => "Layout and Style - Admin Dashboard"
@@ -162,15 +236,14 @@ class AdminController extends Controller
      * @return void
      * @post any html files, .md files, and post summary data are removed.
      */
-    public function deletePost( $slug, $router ) {
+    function deletePost( $slug ) {
         static::$postModel->delete( $slug );
-        $router->redirect( '/admin/edit-posts' );
     }
 
     /**
      * Render the Add Media page in admin
      */
-    public function manageMedia( $slim ) {
+    function manageMedia( $slim ) {
         $slim->render( 'admin/content/manage-media.php', array (
                 'page_title' => "Manage Media",
                 'meta_title' => 'Manage Media - Admin Dashboard'
@@ -181,7 +254,7 @@ class AdminController extends Controller
      * Settings Pages
      *-------------------------------
      */
-    public function settingsSite( $slim ) {
+    function settingsSite( $slim ) {
         $slim->render( 'admin/settings/settings-site.php', array (
                 'page_title' => "Site Settings",
                 'meta_title' => 'Site Settings - Admin Dashboard'

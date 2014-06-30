@@ -17,7 +17,7 @@ class FrontController extends Controller
      * ----------
      */
     // The theme path that frontend controllers will use.
-    const THEMEPATH = 'front/1/';
+    const THEMEPATH = 'front/2/';
 
     // The Post Model, for accessing and setting post data.
     public static $postModel;
@@ -65,6 +65,8 @@ class FrontController extends Controller
         $app->view->setData('logo_url', 
             'http://ewa.ozythemes.com/layout02/wp-content/uploads/sites/2/2013/04/logo_green_x2.png');
         $app->view->setData('site_subtitle', 'This is the site subtitle');
+        $app->view->setData('copyright', '&copy; 2014');
+
         $postData = static::$postModel->getSummary( $slug );
         $postHtml = static::$postModel->getHtml( $slug );
         $postData['content'] = $postHtml;
