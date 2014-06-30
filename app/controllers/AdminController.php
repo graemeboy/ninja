@@ -15,23 +15,64 @@ require_once APPPATH . 'models/Settings.php';
 class AdminController extends Controller
 {
     /**
-     * The model for posts.
+     * The path to the thumbnail directory.
      * 
+     * @access  const
+     * @var  String the path to thumbnails of styles and layouts.
+     */
+    const THUMBNAIL_PATH = "/public/admin/thumbnails";
+
+    /**
+     * The model for posts.
+     *
      * @access public static
      * @var  string
      */
     public static $postModel;
 
+    /**
+     * The model for settings.
+     *
+     * @access  public static
+     * @var  Object model
+     */
+    public static $settingsModel;
+
+    /**
+     * The array of possible layouts, provided by the package.
+     *
+     * @access  public static
+     * @var  Array an array of strings that identify the layouts.
+     */
+    public static $layouts = array (
+        'default', '1', '2'
+    );
+
+    /**
+     * The array of possible styles, provided by the package.
+     *
+     * @access  public static
+     * @var  Array, an array of strings that identify the styles.
+     */
+    public static $styles = array (
+        'amelia', 'cerulean', 'cosmo', 'cyborg', 'darkly', 'flatly',
+        'journal', 'lumen', 'readable', 'simplex', 'slate', 'spacelab',
+        'superhero', 'united', 'yeti'
+    );
+
+
+
     public function __construct() {
         static::$postModel = new Post();
+        static::$settingsModel = new Settings();
     }
     /**
      * The URL requested by "/admin" or "/admin/"
-     * 
-     * Because no specific page in the admin is requested, 
+     *
+     * Because no specific page in the admin is requested,
      * redirect the user to the dashboard.
-     * 
-     * @param Object @app the Slim framework app that provides redirect.
+     *
+     * @param Object  @app the Slim framework app that provides redirect.
      */
     public function index( $app ) {
         // If logged in, redirect to the dashboard.
@@ -39,7 +80,7 @@ class AdminController extends Controller
     }
 
     /**
-     * 
+     *
      */
     function ajaxRequest( $postData ) {
         echo "received post";
@@ -84,8 +125,9 @@ class AdminController extends Controller
      * @return void
      */
     function admin_ajax_update_layout( $data ) {
-        print_r( $data );
-        echo "success";
+        if ( !empty( $data['layout'] ) ) {
+            static::$settingsModel->setLayout( $data['layout'] );
+        }
     }
 
     /**
@@ -99,8 +141,9 @@ class AdminController extends Controller
      * @return void
      */
     function admin_ajax_update_style( $data ) {
-        print_r( $data );
-        echo "success";
+        if ( !empty( $data['style'] ) ) {
+            static::$settingsModel->setStyle( $data['style'] );
+        }
     }
 
 
@@ -223,9 +266,24 @@ class AdminController extends Controller
      * @param slim    Obj
      */
     function appearance( $slim ) {
+        $settings = static::$settingsModel->getAppearanceSettings();
+        // Set some defaults in case mandatory variables are not set.
+        if ( empty( $settings['layout'] ) ) {
+            $settings['layout'] = 'default';
+        }
+        if ( empty( $settings['style'] ) ) {
+            $settings['style'] = 'cerulean';
+        }
+
+
+
         $slim->render( 'admin/appearance.php', array (
                 'page_title' => "Layout and Style",
-                'meta_title' => "Layout and Style - Admin Dashboard"
+                'meta_title' => "Layout and Style - Admin Dashboard",
+                'settings' => $settings,
+                'styles' => static::$styles,
+                'layouts' => static::$layouts,
+                'thumbPath' => self::THUMBNAIL_PATH
             ) );
     }
 
@@ -260,4 +318,4 @@ class AdminController extends Controller
                 'meta_title' => 'Site Settings - Admin Dashboard'
             ) );
     }
-} // class Admin
+} // class AdminController
