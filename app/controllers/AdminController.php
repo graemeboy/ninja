@@ -1,11 +1,15 @@
 <?php namespace ninja\Controllers;
 
-use ninja\Models\Post as Post;
-use ninja\Models\Settings as Settings;
+use ninja\Models\Post;
+use ninja\Models\Page;
+use ninja\Models\Settings;
+use ninja\Libraries\UploadHandler;
 
 require_once BASEPATH . 'admin-functions.php';
 require_once APPPATH . 'models/Post.php';
+require_once APPPATH . 'models/Page.php';
 require_once APPPATH . 'models/Settings.php';
+require_once APPPATH . 'libraries/UploadHandler.php';
 
 /**
  * Class Admin
@@ -16,7 +20,7 @@ class AdminController extends Controller
 {
     /**
      * The path to the thumbnail directory.
-     * 
+     *
      * @access  const
      * @var  String the path to thumbnails of styles and layouts.
      */
@@ -29,6 +33,14 @@ class AdminController extends Controller
      * @var  string
      */
     public static $postModel;
+
+    /**
+     * The model for pages.
+     *
+     * @access public static
+     * @var  string
+     */
+    public static $pageModel;
 
     /**
      * The model for settings.
@@ -63,7 +75,11 @@ class AdminController extends Controller
 
 
     public function __construct() {
+        // Init post model.
         static::$postModel = new Post();
+        // Init page model.
+        static::$pageModel = new Page();
+        // Init settings model.
         static::$settingsModel = new Settings();
     }
     /**
@@ -83,17 +99,14 @@ class AdminController extends Controller
      *
      */
     function ajaxRequest( $postData ) {
-        echo "received post";
         $action = "admin_ajax_" . $postData[ 'action' ];
         // Check if this ajax method exists
         if ( method_exists( $this, $action ) ) {
             unset( $postData['action'] );
-            print_r( $postData );
             $resp = call_user_func_array( array( $this, $action ), array( $postData ) );
         } else {
             $resp = 'incorrect action: ' . $action;
         }
-        echo $resp;
     }
 
     /**
@@ -106,12 +119,24 @@ class AdminController extends Controller
         static::$postModel->delete( $slug );
     }
 
-    function admin_ajax_save( $postData ) {
+    function admin_ajax_save( $contentData ) {
         // Add current time as last updated.
-        $postData['last_edited'] = date( "Y-m-d H:i:s" );
-        // Save the post data.
-        static::$postModel->save( $postData );
-        echo "success";
+        $contentData['last_edited'] = date( "Y-m-d H:i:s" );
+        $contentType = $contentData['contentType'];
+        unset( $contentData['contentType'] );
+        if ( $contentType === 'post' ) {
+            // Save the post data.
+            static::$postModel->save( $contentData );
+        } else if ($contentType === 'page') {
+            // Save the page data.
+            static::$pageModel->save( $contentData );
+        }
+        die( "success" );
+    }
+
+    function admin_ajax_upload_media () {
+        // Handle the upload.
+        $uploadHandler = new UploadHandler();
     }
 
     /**
@@ -177,7 +202,10 @@ class AdminController extends Controller
                 'scripts' => array (
                     '/public/js/markitup/markdown.js',
                     '/public/js/markitup/jquery.markitup.js',
-                    '/public/js/StopWord.js'
+                    '/public/js/StopWord.js',
+                    '/public/js/content.js',
+                    '/public/js/googleAPI.js',
+                    'https://apis.google.com/js/client.js?onload=onClientLoad'
                 ),
                 'styles' => array (
                     '/public/fontawesome/css/font-awesome.min.css'
@@ -191,9 +219,26 @@ class AdminController extends Controller
      * Render the Add Page page in admin
      */
     public function addPage( $slim ) {
+        $page_data = array (
+            'title' => '',
+            'content' => '',
+            'tags' => array (),
+            'slug' => ''
+        );
         $slim->render( 'admin/content/add-page.php', array (
                 'page_title' => "Add a Page",
-                'meta_title' => 'Add a Post - Admin Dashboard'
+                'meta_title' => 'Add a Page - Admin Dashboard',
+                'scripts' => array (
+                    '/public/js/markitup/markdown.js',
+                    '/public/js/markitup/jquery.markitup.js',
+                    '/public/js/StopWord.js',
+                    '/public/js/content.js'
+                ),
+                'styles' => array (
+                    '/public/fontawesome/css/font-awesome.min.css'
+                ),
+                'save_button' => 'Create',
+                'page_data' => $page_data,
             ) );
     }
     /**
@@ -226,10 +271,16 @@ class AdminController extends Controller
     /**
      * Render the Add Page page in admin
      */
-    public function manage_pages( $slim ) {
+    public function managePages( $slim ) {
+        $pages = static::$pageModel->getAll();
+
         $slim->render( 'admin/content/manage-pages.php', array (
                 'page_title' => "Manage Pages",
-                'meta_title' => 'Manage Posts - Admin Dashboard'
+                'meta_title' => 'Manage Posts - Admin Dashboard',
+                'styles' => array (
+                    '/public/fontawesome/css/font-awesome.min.css'
+                ),
+                'pages' => $pages
             ) );
     }
 
@@ -238,11 +289,8 @@ class AdminController extends Controller
      *-------------------------------
      */
     public function editPost( $slim, $slug ) {
-        echo "editing post";
         $postData = static::$postModel->getSummary( $slug );
-        print_r( $postData );
         $postMarkdown = static::$postModel->getMarkdown( $slug );
-        echo $postMarkdown;
         $postData['content'] = $postMarkdown;
 
         $slim->render( 'admin/content/add-post.php', array (
@@ -251,7 +299,9 @@ class AdminController extends Controller
                 'post_data' => $postData,
                 'scripts' => array (
                     '/public/js/markitup/markdown.js',
-                    '/public/js/markitup/jquery.markitup.js'
+                    '/public/js/markitup/jquery.markitup.js',
+                    '/public/js/content.js',
+                    '/public/js/StopWord.js',
                 ),
                 'styles' => array (
                     '/public/fontawesome/css/font-awesome.min.css'
@@ -260,12 +310,47 @@ class AdminController extends Controller
             ) );
     }
 
+    public function editPage( $slim, $slug ) {
+        $pageData = static::$pageModel->getSummary( $slug );
+        $pageMarkdown = static::$pageModel->getMarkdown( $slug );
+        $pageData['content'] = $pageMarkdown;
+
+        $slim->render( 'admin/content/add-page.php', array (
+                'page_title' => "Edit Page",
+                'meta_title' => 'Edit Page - Admin Dashboard',
+                'page_data' => $pageData,
+                'scripts' => array (
+                    '/public/js/markitup/markdown.js',
+                    '/public/js/markitup/jquery.markitup.js',
+                    '/public/js/content.js',
+                    '/public/js/StopWord.js',
+                ),
+                'styles' => array (
+                    '/public/fontawesome/css/font-awesome.min.css'
+                ),
+                'save_button' => 'Save Page',
+            ) );
+    }
+
+    function menu( $slim ) {
+        $slim->render( 'admin/appearance/menu.php', array (
+                'page_title' => "Menu Settings",
+                'meta_title' => "Menu Settings",
+                'icon' => 'dashicons dashicons-menu',
+                'settings' => array()
+            ) );
+    }
+
+    function widgets( $slim ) {
+
+    }
+
     /**
-     * function appearance
+     * function layoutStyle
      *
-     * @param slim    Obj
+     * @param slim
      */
-    function appearance( $slim ) {
+    function layoutStyle( $slim ) {
         $settings = static::$settingsModel->getAppearanceSettings();
         // Set some defaults in case mandatory variables are not set.
         if ( empty( $settings['layout'] ) ) {
@@ -277,9 +362,12 @@ class AdminController extends Controller
 
 
 
-        $slim->render( 'admin/appearance.php', array (
+        $slim->render( 'admin/appearance/layoutStyle.php', array (
                 'page_title' => "Layout and Style",
                 'meta_title' => "Layout and Style - Admin Dashboard",
+                'scripts' => array (
+                    '/public/js/appearance.js',
+                ),
                 'settings' => $settings,
                 'styles' => static::$styles,
                 'layouts' => static::$layouts,
@@ -288,14 +376,40 @@ class AdminController extends Controller
     }
 
     /**
-     * function deletePost
-     *
+     * Delete a post
+     * 
+     * Delete a post's associated files, give a valid post slug.
      * @param string  $slug, the slug identifier of the post_data
      * @return void
      * @post any html files, .md files, and post summary data are removed.
      */
     function deletePost( $slug ) {
         static::$postModel->delete( $slug );
+    }
+
+    /**
+     * Delete a media file and its thumbnail.
+     *
+     * Check if a media file exists, given the file name, and delete the file and its thumbnail.
+     * @param string  $filename, the file name of the media file within media directory.
+     * @return void
+     * @post the media file and its associated thumbnail are deleted from the server.
+     */
+    function deleteMedia( $filename ) {
+        // Define the path to the file. Does not need resolving.
+        $filePath = PUBLICPATH . "media/$filename";
+        // Check if file exists.
+        if (is_readable($filePath)) {
+            // Delete the file.
+            unlink($filePath);
+        }
+        // Define the path to the file's thumbnail.
+        $thumbPath = PUBLICPATH . "media/thumbnail/$filename";
+        // Check if thumbnail exists.
+        if (is_readable($thumbPath)) {
+            // Delete the thumbnail.
+            unlink($thumbPath);
+        }
     }
 
     /**
