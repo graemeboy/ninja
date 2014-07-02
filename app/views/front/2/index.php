@@ -1,6 +1,6 @@
 <?php include_once ('header.php') ?>
 
-<h2><?php echo $title ?></h2>
-<?php echo $content ?>
+<h1>Example page title</h1>
+<p>Example page content</p>
 
 <?php include_once ('footer.php') ?>

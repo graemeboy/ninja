@@ -7,10 +7,11 @@
     <link href="/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/public/dashicons/css/dashicons.css" rel="stylesheet">
     
-    <script src="/public/js/jQuery/jquery.min.js"></script>
-    <script src="/public/js/jQuery/jquery.migrate.min.js"></script>
-<!--    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700' rel='stylesheet' type='text/css'>-->
-    <?php
+    <script src="/public/js/jQuery/jquery.min.js" type="text/javascript"></script>
+    <script src="/public/js/jQuery/jquery.migrate.min.js" type="text/javascript"></script>
+    <script src="/public/js/utils.js" type="text/javascript"></script>
+<!--     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700' rel='stylesheet' type='text/css'>
+ -->    <?php
     // Load any other scripts that a particular view requires.
     if (!empty($scripts)) {
         foreach ($scripts as $script_src) {
@@ -26,11 +27,16 @@
     
     <style type="text/css">
         body {
-/*            font-family: 'Open Sans', 'Lucida Grande', helvetica, sans-serif;*/
-            font-family: sans-serif;
-            font-weight: lighter; 
+            /*font-family: 'Open Sans', 'Lucida Grande', helvetica, sans-serif;*/
+            /*font-family: sans-serif;*/
+            font-family: 'Helvetica Neue', sans-serif;
+            font-weight: 300;
             color: white;
             background:  linear-gradient(to bottom, #668188 0%,#3c5760  100%);
+        }
+        h1,h2,h3,h4 {
+            font-weight: 100;
+            /*font-weight: normal*/
         }
         .form-control {
             background: rgba(0,0,0,0.15);
@@ -40,13 +46,47 @@
             height: 40px;
             padding: 10px 14px;
 */
+            font-weight: 300;
             border-radius: 0;
             -webkit-border-radius: 0;
             -moz-border-radius: 0;
         }
         /* Tables */
+        .admin-table {
+            background:rgba(0,0,0,0.1);
+        }
+        .edit-page-action {
+            height:45px;
+        }
+        .action-col {
+            text-align: center;
+        }
+        .edit-page-icon, .edit-page-title {
+            text-align:center;   
+        }
+        .edit-page-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        td.edit-post-actions {
+            padding: 0 !important;   
+        }
+        .admin-table a:hover {
+            text-decoration: none;
+        }
+        table.admin-table>tbody>tr>td, table.admin-table>thead>tr>th {
+            height:60px;
+            padding: 0 15px;
+            vertical-align: middle;
+        }
+        table.admin-table>tbody>tr>td:hover {
+            background:rgba(255,255,255,0.1);
+        }
+        table.admin-table>tbody>tr>td, table.admin-table>thead>tr>th {
+            border-color: rgba(0,0,0,0.1);
+        }
         .admin-table td, label {
-            font-weight: lighter;   
+            font-weight: 300;   
         }
         .admin-table td a, .admin-table th {
             font-weight: normal;   
@@ -86,6 +126,7 @@
         #admin-header-wrap {
             background-color: #333;
             padding: 10px;
+            font-weight: 300;
         }
         #admin-head-title {
             font-size: 16px
@@ -98,7 +139,8 @@
         #admin-menu {
             height: 100%;
             overflow-y: scroll;
-            background-color: #3d3f3e
+            background-color: #3d3f3e;
+            font-weight: 300;
         }
         #admin-menu a {
             color: #fff;   
@@ -148,6 +190,7 @@
         }
         .nav-item-active {
             border-right: 5px solid #5dd680;
+            font-weight: 500;
         }
         .admin-menu-icon {
             margin-right: 15px;
@@ -156,24 +199,28 @@
             background-color: #fff;
         }
         h2.page-title, h3.page-title {
-            font-weight: 100;
+            /*font-weight: 100;*/
+            /*font-weight: normal*/
         }
         h2.page-title {
-            margin: 30px;
-            font-size: 34px;   
+            margin: 30px 0;
+            font-size: 37px;
         }
         h3.page-title {
             margin: 15px 0 15px 30px;
             font-size: 22px;
         }
-        textarea.edit-post-content, textarea.edit-page-content {
+        h3.page-subtitle {
+            font-size: 29px;
+        }
+        textarea.edit-content {
             height: 200px;   
         }
         .btn {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 0;
             border: none;
-            font-weight: lighter;
+            font-weight: 300;
         }
         
 /*
@@ -207,24 +254,47 @@
             background: rgba(255,255,255,0.1);
         }
         
-        .edit-page-icon, .edit-page-title {
-            text-align:center;   
+
+        /*
+            Appearance page
+         */
+        .appearance-item {
+            display: block;
+            float:left;
+            margin-right:5px;
+            margin-bottom:5px;
+            padding:5px;
+            height:250px;
+            width:250px;
+            background:rgba(0,0,0,0.1);
         }
-        .edit-page-icon {
-            font-size: 22px;
-            margin-bottom: 5px;
+        .appearance-item:hover {
+            background:rgba(0,0,0,0.5);
         }
-        a.edit-page-action {
-            display:inline-block;
-            padding:10px;
-            text-align:center
+        .appearance-preview {
+            height:240px;
+            width:240px;
+            background-repeat: no-repeat;
         }
-        td.edit-post-actions {
-            padding: 0 !important;   
+        .appearance-active {
+            background:rgba(255,255,255,0.5);
         }
-        a.edit-page-action:hover {
-            background: rgba(255,255,255,0.1);   
-            text-decoration: none;
+
+        /*
+            Notifications
+         */
+        .notification-wrapper {
+            display:none;
+        }
+        .notification {
+            height: 40px;
+            padding: 11px 20px;
+            font-size: 16px;
+            line-height: 18px;
+            background: rgba(62,89,98,0.7);
+            margin: 5px 0;
+            display: inline-block;
+            position:fixed;top:30px;left:40%;
         }
     </style>
 </head>

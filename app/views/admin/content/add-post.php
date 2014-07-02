@@ -3,11 +3,6 @@
 
     page_title($page_title, 'dashicons dashicons-welcome-write-blog');
 
-/*
- * -----------------
- * Set default post data
- * -----------------
- */
     extract($post_data);
     $tags = implode(', ', $tags);
 

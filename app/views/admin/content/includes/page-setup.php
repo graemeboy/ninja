@@ -1,35 +1,32 @@
 <div class="container">
+    <div class="row">
     <div class="col-sm-8">
-        <div class="admin-widget">
-            <form role="form">
-                <input type="hidden" name="slug-original" value="<?php echo $slug ?>" />
-                <div class="form-group">
-                    <label for="edit-page-title" class="sr-only">page Title</label>
-                    <input type="text" class="form-control input-lg edit-page-title" placeholder="Enter title here" id="edit-page-title" value="<?php echo $title ?>" />
-
-                </div>
-                <div class="form-group">
-                    <label for="edit-page-tags" class="sr-only">Tags (separate with commas)</label>
-                    <input type="text" class="form-control edit-page-title" placeholder="Tags (separate with commas)" id="edit-page-title" value="<?php echo $tags ?>" />
-
-                </div>
-                <div class="form-group">
-                    <label for="edit-page-content" class="sr-only">page Content</label>
-
-                    <textarea class="form-control edit-page-content" id="edit-page-content" placeholder="Enter content here"><?php echo $content ?></textarea>
-                </div>
-            </form>
-        </div>
+        <form id="save-content-form" role="form">
+            <input type="hidden" name="slug-original" id="slug-original" value="<?php echo $slug ?>" />
+            <?php 
+            // Include a title input.
+            include('edit-title.php');
+            
+            // Include a slug input.
+            include('edit-slug.php');
+            
+            // Include a content input.
+            include('edit-content.php');
+            ?>
+        </form>
     </div>
     <div class="col-sm-4">
-        <div>
-            <a href="#" class="btn btn-lg btn-success"><?php echo $save_button ?></a>
-        </div>
+        <?php include('save-button.php') ?>
+    </div>
+    <div id="page-notification">
+        <?php include ( APPPATH . 'views/admin/includes/notification.htm'); ?>
     </div>
 </div>
-<script language="javascript">
-$(document).ready(function()	{
-    $('#edit-page-content').markItUp(myMarkdownSettings);
-});
+</div>
+
+<script type="text/javascript">
+// Defined whether to automatically set tags based on title.
+var setTags = false;
+// Set the content type to page, not post.
+var contentType = "page";
 </script>
-<h3 class="page-title">Add Content</h3>

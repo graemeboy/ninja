@@ -13,8 +13,14 @@
     $appearance_navigation = array (
         'icon' => 'dashicons dashicons-admin-appearance',
         'children' => array (
-            'appearance' => array (
-                'title' => 'Theme and Style',
+            'layout-style' => array (
+                'title' => 'Layout and Style',
+            ),
+            'menu' => array (
+                'title' => 'Menu',
+            ),
+            'widgets' => array (
+                'title' => 'Widgets',
             ),
         )
     );
@@ -56,7 +62,7 @@
     $core_navigation_media = array (
         'icon' => 'dashicons dashicons-admin-media',
         'children' => array (
-                'appera-media' => array (
+                'add-media' => array (
                 'title' => 'Add Media',
             ),
                 'manage-media' => array (

@@ -1,140 +1,260 @@
 <div class="container">
+    <div class="row">
     <div class="col-sm-8">
-        <div class="admin-widget">
-            <form id="save_post_form" role="form">
-                <input type="hidden" name="slug-original" id="slug-original" value="<?php echo $slug ?>" />
-                <div class="form-group">
-                    <label for="edit-post-title" class="sr-only">Post Title</label>
-                    <input type="text" class="form-control input-lg edit-post-title" placeholder="Enter title here" id="edit-post-title" name="title" value="<?php echo $title ?>" />
-
+        <form id="save-content-form" role="form">
+            <input type="hidden" name="slug-original" id="slug-original" value="<?php echo $slug ?>" />
+            <?php include('edit-title.php') ?>
+            <div class="row">
+                <div class="col-sm-6">
+                    <?php include('edit-slug.php') ?>
                 </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="edit-post-tags" class="sr-only control-label">Slug</label>
-                            <input type="text" class="form-control edit-post-slug" placeholder="Slug" id="edit-post-slug" name="slug"  value="<?php echo $slug ?>" />
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="edit-post-tags" class="sr-only control-label">Tags</label>
-                            <input type="text" class="form-control edit-post-tags" placeholder="Tags (separate with commas)" id="edit-post-tags" name="tags" value="<?php echo $tags ?>" />
-                        </div>
-                    </div>
+                <div class="col-sm-6">
+                    <?php include('edit-tags.php') ?>
                 </div>
-                <div class="form-group">
-                    <label for="edit-post-content" class="sr-only">Post Content</label>
-
-                    <textarea class="form-control edit-post-content" id="edit-post-content" name="content" placeholder="Enter content here">
-                        <?php echo $content ?>
-                    </textarea>
-                </div>
-            </form>
-        </div>
+            </div>
+            <?php include('edit-content.php') ?>
+        </form>
     </div>
     <div class="col-sm-4">
-        <div>
-            <a href="#" id="save-post-button" class="btn btn-lg btn-success">
-                <?php echo $save_button ?>
-            </a>
-        </div>
-        <div class="page-notification" style="font-size:14px;background:rgba(255,255,255,0.3);margin-top:18px;position:relative;height:35px;display:none;"><div class="post-save-progress" style="width:0;height:35px;background:rgba(0,0,0,0.1)"></div><div style="position:absolute; top: 7px; left: 10px;" class="page-notification-text">Saving post...</div></div>
+        <?php include('save-button.php') ?>
+    </div>
+
+    <div id="page-notification">
+        <?php include ( APPPATH . 'views/admin/includes/notification.htm'); ?>
     </div>
 </div>
-<script language="javascript">
-    $(document).ready(function () {
-        var keywords;
-        // Defined whether to automatically set tags based on title.
-        var setTags = true;
-        // Defined whether to automatically set slug based on title.
-        var setSlug = true;
-        $('#edit-post-content').markItUp(myMarkdownSettings);
-        $('#edit-post-title').keyup(function () {
-            keywords = $(this).val().toLowerCase().removeStopWords();
-            if (setSlug === true) {
-                $('#edit-post-slug').val(encodeURIComponent(
-                    keywords.replace(/ /g, '-')));
-            } // if
-            if (setTags === true) {
-                $('#edit-post-tags').val(keywords.replace(/ /g, ', '));
-            } // if
-        });
-        $('#edit-post-tags').keyup(function () {
-            setTags = false;
-        });
-        $('#edit-post-slug').keyup(function () {
-            setSlug = false;
-        });
-        
-        $('#save-post-button').click(function (e) {
-           e.preventDefault();
-            var contentValid = false;
-            if ((contentValid = validatePostContent()) !== true) {
-                alert(contentValid);
-                return false;
-            } // if
-            $('.page-notification-text').text('Saving post...');
-            $('.page-notification').show();
-            var data = $('form#save_post_form').serialize();
-            data += '&action=save_post';
-            $.ajax({
-                url: "/admin/ajax",
-                type: "POST",
-                data: data,
-                complete: function (resp) {
-                    $('.page-notification-text').text('Post saved successfully.');
-                    console.log(resp.responseText);
-                    // If user clicks button again, it saves, not publishes.
-                    $('#save-post-button').text('Save Post');
-                    $('#slug-original').val($('#edit-post-slug').val());
-                    // No more automatic updates for slug
-                    setSlug = false;
-                },
-                progress: function (evt) {
-                    if (evt.lengthComputable) {
-                        $('.post-save-progress').css('width', parseInt((evt.loaded / evt.total * 100), 10) + "%");
-                    } else {
-                        console.log("Length not computable.");
-                    } // else
-                } // progress
-            })
-        });
-        
-        /**
-         * Boolean validatePostContent
-         * Returns true if the post is okay to save, else returns an error message.
-         */
-        function validatePostContent () {
-            if ($('#edit-post-slug').val() === '') {
-                return 'The slug must contain at least some characters!';
-            }
-            return true;
-        } // validatePostContent ()
-        
-        $('#edit-post-content, #edit-post-title, #edit-post-tags, #edit-post-slug').keyup(function () {
-           $('.page-notification').fadeOut(); 
-        });
+</div>
+<script type="text/javascript">
+// Defined whether to automatically set tags based on title.
+var setTags = true;
+// Set the content type to page, not post.
+var contentType = "post";
 
-        (function addXhrProgressEvent($) {
-            var originalXhr = $.ajaxSettings.xhr;
-            $.ajaxSetup({
-                progress: function () {
-                    console.log("standard progress callback");
-                },
-                xhr: function () {
-                    var req = originalXhr(),
-                        that = this;
-                    if (req) {
-                        if (typeof req.addEventListener == "function") {
-                            req.addEventListener("progress", function (evt) {
-                                that.progress(evt);
-                            }, false);
-                        }
-                    }
-                    return req;
-                }
-            });
-        })(jQuery);
+
+/**
+ * Script written by J.
+ */
+// on button submit, prcoess query text and run searches
+$( "#edit-tags" ).change(function ( ) {
+    var values = $( "#edit-tags" ).val();
+    
+    // youtube and google image search takes a string with all keywords separated by spaces
+    var query = values.replace(",", "");
+    // execute youtube and google image search
+    googleSearch(query);
+    
+    // wikipedia article search takes an array of the tags
+    values = values.split(","); 
+    values = values.map(function (el) {
+        return el.trim();
     });
+    // execute search on wikipedia
+    wikiSearch(values);
+});
+
+// $(document).ready(function () {
+//     // disable submit button until all apis are loaded
+//     $('input[type="submit"]').attr('disabled','disabled');
+// }) // ready
+
+// initialize google client (for current apis)
+function onClientLoad() {
+    // set api key, then call function to load youtube api
+    gapi.client.setApiKey('AIzaSyAkgodW46UpahLkm0pNT-Gb2fwVDTjsUO0');
+    window.setTimeout(loadYoutubeApi,1);
+} // onClientLoad
+
+// load youtube api
+function loadYoutubeApi() {
+    gapi.client.load('youtube', 'v3', function() {
+        // initalize submit button
+        $('input[type="submit"]').removeAttr('disabled');
+    })
+} // loadYoutubeApi
+
+// initialize google client for image search (using deprecated api)
+google.load('search', '1');
+
+var imageSearch;
+
+// set up google client for image search
+function OnLoad() {
+    imageSearch = new google.search.ImageSearch();
+
+    // use imageSearchComplete as callback when image search terminates
+    imageSearch.setSearchCompleteCallback(this, imageSearchComplete, null);
+    
+    // set usage rights restrictions to return only images that can be used 
+    imageSearch.setRestriction(google.search.ImageSearch.RESTRICT_RIGHTS,
+                               google.search.ImageSearch.RIGHTS_REUSE);
+} // OnLoad
+
+
+google.setOnLoadCallback(OnLoad);
+
+// callback for adding video results to page
+function videoSearchComplete(response) {
+    
+    // make sure we have video results
+    if (response.items && response.items.length > 0) {
+        // clear videos div
+        $('#vids').html('')
+        results = response.items;
+        
+        // iterate through results and add them to videos div
+        for (var i = 0; i < results.length; i++) {
+            
+            // set up embed code using defalt youtube embed settings
+            var embedCode = '<iframe width="400" height="315" src="//www.youtube.com/embed/' + results[i].id.videoId + '" frameborder="0" allowfullscreen></iframe>';
+            
+            // clean up embed code to display on page
+            var displayCode = embedCode.replace("<", "&lt;").replace(">", "&gt;");
+        
+            // append video and embed code to videos div
+            $('#vids').append('<div class="row"><div class="col-md-5">' + embedCode + '<</div>' + '<div class="col-md-7"><strong>Embed Code:</strong><pre>' + displayCode + '</pre></div></div>')
+    } // for
+  } // if
+} // videoSearchComplete
+    
+// callback for adding image results to page
+function imageSearchComplete() {
+
+    // make sure we have image results
+    if (imageSearch.results && imageSearch.results.length > 0) {
+        
+        // clear images div
+        $('#images').html('');
+        results = imageSearch.results;
+        
+        // iterate through results and add them to images div
+        for (var i = 0; i < results.length; i++) {
+            $('#images').append('<div class="row"><div class="col-md-5"><img src="' + results[i].url + '" width=400></div><div class="col-md-7"><strong>Image URL:</strong><pre>' + results[i].url + '</pre></div></div>');
+        } // for
+    } // if
+} // imageSearchComplete
+    
+// calls youtube and google image search
+function googleSearch(q) {
+  
+  // execute initalized image search on query string
+  imageSearch.execute(q);
+  
+ // execute youtube search, then execute callback 
+  var request = gapi.client.youtube.search.list({
+    q: q,
+    part: 'snippet',
+    type: 'video',
+    videoEmbeddable: 'true',
+    videoSyndicated: 'true'
+  });
+  request.execute(videoSearchComplete);
+} // search
+    
+// scrape references from wikipedia for each query tag
+function wikiSearch(q) {
+    
+    // clear articles div
+    $('#articles').html('');
+
+    for (var i = 0; i < q.length; i++) {
+        query = q[i]
+        
+        // search wikipedia via ajax request to api
+        $.ajax({
+            type: 'GET',
+            url: 'http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURI(query) + '&format=json&callback=?',
+            contentType: 'application/json; charset=utf-8',
+            async: false,
+            dataType: 'json',
+            success: function (data, textStatus, jqXHR) {
+                
+                // dumb method: just grab the first search result
+                var title = data.query.search[0].title;
+                
+                // load the first result page via ajax request to wiki api
+                $.ajax({
+                    type: 'GET',
+                    url: 'http://en.wikipedia.org/w/api.php?action=parse&page=' + encodeURI(title) + '&format=json&prop=text&callback=?',
+                    contentType: 'application/json; charset=utf-8',
+                    async: false,
+                    dataType: 'json',
+                    success: function (page) {
+                        
+                        // grab the html for the page
+                        var wikihtml = page.parse.text['*'];
+                        
+                        // create a div to control DOM elements
+                        var div = document.createElement('div');
+                        div.innerHTML = wikihtml;
+                        
+                        // grab all the links under the references header
+                        var elements = div.getElementsByClassName('references')[0].getElementsByTagName('a');
+                        
+                        // iterate through links and
+                        for (var i = 0; i < elements.length; i++) {
+                            
+                            // make sure link goes to an external site
+                            if (elements[i].matches('.external')) {
+                                var link = elements[i];
+                                // append link to articles div
+                                $('#articles').append('<a href="' + link.getAttribute('href') + '"><strong>'+ link.innerHTML + '</strong></a><pre>' + link.getAttribute('href') + '</pre></div></div>');
+                            } // if
+                        } // for
+                    }, // success
+                    error: function (errorMessage) {
+                        console.log(errorMessage);
+                    } // error
+                }); // ajax
+            }, // success
+            error: function (errorMessage) {
+                console.log(errorMessage);
+            } // error
+        }); // ajax
+    } // for
+} // wikiSearch
 </script>
 <h3 class="page-title">Add Content</h3>
+
+<div class="container" id="content">
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                          Youtube Videos
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse in">
+                    <div id="vids" class="panel-body">
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                          Google Images
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse">
+                  <div id="images" class="panel-body">
+                  </div>
+                </div>
+            </div>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+                  Popular Articles
+                </a>
+              </h4>
+            </div>
+            <div id="collapseThree" class="panel-collapse collapse">
+              <div id="articles" class="panel-body">
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
