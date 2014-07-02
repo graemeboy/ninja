@@ -1,59 +1,45 @@
-<?php
+<?php namespace ninja\Models;
 
-class pageModel extends ContentModel
+require_once('Content.php');
+use ninja\Models\Content as Content;
+
+class Page extends Content
 {
+    /*-------------
+     * Fields
+     *------------
+     */
+    // Summary path, a path to some standard data file type (json, xml, yaml.)
+    const SUMMARY_PATH = "pages/pages_summary.json";
+    // HTML path, a path to the HTML files for content, used to display pages on frontend.
+    const HTML_PATH = "pages/html/";
+    // Markdown path, a path to the .md file used for editing pages in the admin area.
+    const MARKDOWN_PATH = "pages/markdown/";
+
 
     function __construct() {
-        
+        // Set the content paths.
+        $this->setMarkdownPath( DATAPATH . self::MARKDOWN_PATH );
+        $this->setHtmlPath( DATAPATH . self::HTML_PATH );
+        $this->setSummaryPath( DATAPATH . self::SUMMARY_PATH );
     }
+    
+    /* -----------------
+     *  Observers
+     * ----------------
+     */
 
     /**
-     * Get all page summaries
-     * @return array of pages
+     * function isPage
+     * Returns true if a page is contained in the array of pages stored in summary.
+     *
+     * @param string  $slug
+     * @return boolean isPage
      */
-    public function get_pages()
-    {
-       // Return pages as an array.
-       return json_decode(file_get_contents(DATAPATH .
-                                'pages/pages_summary.json'), true);
-    } // get pages()
-    
-    /* -----------
-     *  Mutator Methods
-     * -----------
-     */
-    
-//    protected function setMarkdownPath() {
-//        // Set the Markdown content path.
-//        self::$markdownPath = DATAPATH . self::MARKDOWN_PATH;
-//    }
-//    
-//    protected function setHtmlPath() {
-//        // Set the HTML content path.
-//        self::$htmlPath = DATAPATH . self::HTML_PATH;
-//    }
-//    
-//    protected function setSummaryPath() {
-//        // Set the summary page path.
-//        self::$summaryPage = DATAPATH . self::SUMMARY_PATH;
-//    }
-    
-    /**
-     * Add a page to the pages "database"
-     */
-    public function add_page ($page_data)
-    {
-        
-    } // add_page(array)
-
-    /**
-     * Delete a song in the database
-     * Please note: this is just an example! In a real application you would not simply let everybody
-     * add/update/delete stuff!
-     * @param int $song_id Id of song
-     */
-    public function delete_page($page_id)
-    {
-        
-    } // delete_page(int)
+    public function isPage( $slug ) {
+        // Get all page summaries (the smallest sets of data about posts)
+        $pages = $this->getAll();
+        // Return boolean if a page exists with this slug.
+        return !empty( $pages[$slug] );
+    } // isPage(string)
 } // class pageModel

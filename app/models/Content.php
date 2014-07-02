@@ -10,6 +10,8 @@
  * have similar traits - save, delete, and a request for all tokens of its type.
  * This abstract class defines the common functions, while extended classes are intended to set
  * different directory paths for data, and provide a minimal number of idiosyncratic functions.
+ * 
+ * @todo  safeSlug
  */
 abstract class Content {
 
@@ -20,6 +22,10 @@ abstract class Content {
     // The path in which markdown content is store for access when editing in the admin area.
     protected $markdownPath;
 
+    function __construct () {
+
+    }
+    
     /**
      * getAll
      * Return a PHP array of all the items of the current object's content type.
@@ -142,10 +148,13 @@ abstract class Content {
      * @return void
      */
     function appendSummary( $postData ) {
-        // Separate string of tags into array, using ',' as delineator.
-        $tags = explode( ',', $postData['tags'] );
-        // Remove any whitespace around each tag.
-        $postData['tags'] = trimTags( $tags );
+        // Check if content has tags (pages will not.)
+        if (!empty($postData['tags'])) {
+            // Separate string of tags into array, using ',' as delineator.
+            $tags = explode( ',', $postData['tags'] );
+            // Remove any whitespace around each tag.
+            $postData['tags'] = array_map( 'trim', $tags );
+        }
         // Get all of the posts as assoc array
         $posts = $this->getAll();
         // Set the array with item slug to the given post data
@@ -169,7 +178,7 @@ abstract class Content {
         $htmlContent = convert_md_to_html( $markdown );
         // Remove content before saving summary.
         unset( $contentData['content'] );
-        // Remove any existing post with the original slug
+        //Remove any existing post with the original slug
         if ( !empty( $contentData['slug-original'] ) ) {
             // The old slug must be deleted, if it's not the same as the new one.
             if ( $contentData['slug-original'] !== $contentData['slug'] ) {
@@ -182,7 +191,7 @@ abstract class Content {
         $this->appendSummary( $contentData );
         // Save HTML
         $this->saveHTMLToFile( $htmlContent, $slug );
-        // Save Markdown
+        // // Save Markdown
         $this->saveMarkdownToFile( $markdown, $slug );
     }
 
@@ -266,6 +275,30 @@ abstract class Content {
             unlink( $filename );
         } // if
     }
+
+    /**
+     * function forceSafeSlug
+     * Ensures that the slug can be used as it is.
+     * This ought to have been done on the frontend, but is further
+     * reinforced at this point.
+     *
+     * @param string  $str
+     * @param int     $length, the maximum length of the slug
+     * @return string
+     */
+    //    function forceSafeSlug($str, $length = 64) {
+    //        $str = safeString(strip_tags($str));
+    //
+    //        $str = str_replace(" ", "-", $str);
+    //        $str = strtolower(preg_replace("/[^a-zA-Z0-9_-]/i", "", $str));
+    //        $str = preg_replace("/[-]+/i", "-", $str);
+    //        if ($length > 0) {
+    //            $str = substr($str, 0, $length);
+    //        }
+    //        $str = trim($str, " -"); // Make sure it doesn't start or end with '-'..
+    //
+    //        return $str;
+    //    }
 
 } // class ContentModel
 ?>
