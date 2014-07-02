@@ -17,9 +17,10 @@ function postAdminAjax(data, callback) {
         type: "POST",
         data: data
     }).done(function(resp) {
-        console.log(resp);
         callback(true);
-    }).fail(function() {
+    }).fail(function(resp) {
+        console.log("Failure: ");
+        console.log(resp.responseText);
         callback(false);
     });
 } // postAdminAjax (JSON obj)
@@ -58,9 +59,9 @@ function changeNotification(success, element, successNotification, failureNotifi
         textToShow = failureNotification;
     } // else
     // Set the new text
-    $(element + ' .notification').text(successNotification);
+    $(element + ' .notification').text(textToShow);
     // Show the element
     $(element + ' .notification-wrapper').fadeIn();
-    // Hide the notification after 3 seconds.
-    hideNotification(element, 3);
+    // Hide the notification after 4 seconds.
+    hideNotification(element, 4);
 } // changeNotification
