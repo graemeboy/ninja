@@ -51,13 +51,18 @@ $router->get( '/admin/menu', function () use ( $admin, $router ) {
 		$admin->menu( $router );
 	} );
 // Appearance Settings - Widgets
-$router->get( '/admin/widgets', function () use ( $admin, $router ) {
-		$admin->widgets( $router );
+$router->get( '/admin/sidebar', function () use ( $admin, $router ) {
+		$admin->sidebar( $router );
 	} );
 // Delete post
 $router->get( '/admin/delete-post/:slug', function ( $slug ) use ( $admin, $router ) {
 		$admin->deletePost( $slug );
 		$router->redirect( '/admin/edit-posts' );
+	} );
+// Delete page
+$router->get( '/admin/delete-page/:slug', function ( $slug ) use ( $admin, $router ) {
+		$admin->deletePage( $slug );
+		$router->redirect( '/admin/edit-pages' );
 	} );
 // Delete media
 $router->get( '/admin/delete-media/:slug', function ( $slug ) use ( $admin, $router ) {

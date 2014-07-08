@@ -1,7 +1,9 @@
 <?php namespace ninja\Models;
 
 require_once('Content.php');
-use ninja\Models\Content as Content;
+require_once('Settings.php');
+use ninja\Models\Content;
+use ninja\Models\Settings;
 
 class Page extends Content
 {
@@ -36,10 +38,22 @@ class Page extends Content
      * @param string  $slug
      * @return boolean isPage
      */
-    public function isPage( $slug ) {
+    function isPage( $slug ) {
         // Get all page summaries (the smallest sets of data about posts)
         $pages = $this->getAll();
         // Return boolean if a page exists with this slug.
         return !empty( $pages[$slug] );
     } // isPage(string)
+
+    /*  ---------------------
+     *   Mutators
+     *  ---------------------
+     */
+    
+    function save ($pageData) {
+        parent::save($pageData);
+        // Now, add it to the primary and secondary menus.
+        $settingsModel = new Settings();
+        $settingsModel->addMenuItem('primary', $pageData['slug'], $pageData['title']);
+    }
 } // class pageModel

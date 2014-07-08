@@ -19,8 +19,8 @@
             'menu' => array (
                 'title' => 'Menu',
             ),
-            'widgets' => array (
-                'title' => 'Widgets',
+            'sidebar' => array (
+                'title' => 'Sidebar',
             ),
         )
     );

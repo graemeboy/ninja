@@ -296,6 +296,51 @@
             display: inline-block;
             position:fixed;top:30px;left:40%;
         }
+
+        /*
+            Add content styles
+         */
+        .embed-code {
+            border: 1px solid rgba(0,0,0,0.1);
+            margin: 10px 0;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+        .embed-item {
+            margin-bottom: 10px;
+        }
+        /*
+            Admin Panel
+         */
+        .admin-panel {
+            background: rgba(0,0,0,0.1);
+        }
+        .admin-panel .panel-heading {
+            background: rgba(0,0,0,0.1);
+        }
+
+        /*
+            Menu Settings Page
+         */
+         label.menu-check-label {
+            font-weight: 400;
+         }
+         div.menu-check-wrap {
+            margin:15px 0;
+         }
+
+         /*
+            Sidebar Settings Page
+          */
+         
+         textarea.widget-textarea {
+            height: 105px;
+         }
     </style>
 </head>
 

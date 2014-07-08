@@ -9,13 +9,14 @@ $(document).ready(function() {
     var keywords;
     // Defined whether to automatically set slug based on title.
     var setSlug = true;
-
     // Transform the edit content textarea into a markdown editor.
     $('textarea#edit-content').markItUp(myMarkdownSettings);
 
     // When tags are edited, turn off auto set tags.
-    $('#edit-tags').keyup(function() {
+    $('#edit-tags').blur(function() {
         setTags = false;
+        // Always perform the search if the edit-tags field is blurred.
+        performSearch();
     });
     // When slug is edited, turn off auto set slug.
     $('#edit-slug').keyup(function() {
@@ -23,16 +24,38 @@ $(document).ready(function() {
     });
 
     // Automatically set tags and slugs.
-    $('#edit-title').keyup(function() {
-        keywords = $(this).val().toLowerCase().removeStopWords();
+    $('#edit-title').keyup(debounce(function() {
+        keywords = $('#edit-title').val().toLowerCase().removeStopWords();
         if (setSlug === true) {
             $('#edit-slug').val(encodeURIComponent(
                 keywords.replace(/ /g, '-')));
         } // if
         if (setTags === true) {
-            $('#edit--tags').val(keywords.replace(/ /g, ', '));
+            $('#edit-tags').val(keywords.replace(/ /g, ', '));
+            performSearch();
         } // if
-    });
+    }, 350));
+
+    /**
+     * Limit the number of times that the API can be requested through debouncing.
+     *
+     * Use an interval to specify when the API might be used, specifically after the
+     * user has finnished typing for a while.
+     * @param  function func the function to be debounced.
+     * @param  int interval the number of miliseconds delayed for calling.
+     * @return the return value of func
+     */
+
+    function debounce(func, interval) {
+        var lastCall = -1;
+        return function() {
+            clearTimeout(lastCall);
+            var args = arguments;
+            lastCall = setTimeout(function() {
+                func.apply(this, args);
+            }, interval);
+        };
+    } // debounce (function, integer)
 
     /**
      * Callback for the completion of the post request to save a post.
@@ -66,7 +89,7 @@ $(document).ready(function() {
     function validateContent() {
         if ($('#edit-post-slug').val() === '') {
             return 'The slug must contain at least some characters!';
-        }
+        } // if
         return true;
     } // validateContent ()
 

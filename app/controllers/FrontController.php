@@ -77,6 +77,7 @@ class FrontController extends Controller
         $app->render( static::$themeDir . 'post.php', array (
                 'meta_title' => $postData['title'],
                 'post_data' => $postData,
+                'sidebar_content' => "<p>Hello there sidebar<p>",
             ) );
     } // post ()
 

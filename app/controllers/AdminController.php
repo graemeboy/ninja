@@ -99,6 +99,7 @@ class AdminController extends Controller
      *
      */
     function ajaxRequest( $postData ) {
+
         $action = "admin_ajax_" . $postData[ 'action' ];
         // Check if this ajax method exists
         if ( method_exists( $this, $action ) ) {
@@ -110,10 +111,27 @@ class AdminController extends Controller
     }
 
     /**
+     * Set the primary menu items.
+     *
+     */
+    function admin_ajax_set_primary_menu( $data ) {
+        $items = array_filter( explode( ',', $data['items'] ) );
+        static::$settingsModel->setPrimaryMenu( $items );
+    }
+
+    /**
+     * Set the secondary menu items.
+     *
+     */
+    function admin_ajax_set_secondary_menu( $data ) {
+        $items = array_filter( explode( ',', $data['items'] ) );
+        static::$settingsModel->setSecondaryMenu( $items );
+    }
+
+    /**
      * admin_ajax_delete
      *
      * @param string  $slug
-     * @return [type]            [description]
      */
     function admin_ajax_delete( $slug ) {
         static::$postModel->delete( $slug );
@@ -127,14 +145,21 @@ class AdminController extends Controller
         if ( $contentType === 'post' ) {
             // Save the post data.
             static::$postModel->save( $contentData );
-        } else if ($contentType === 'page') {
-            // Save the page data.
-            static::$pageModel->save( $contentData );
-        }
+        } else if ( $contentType === 'page' ) {
+                // Save the page data.
+                static::$pageModel->save( $contentData );
+            }
         die( "success" );
     }
 
-    function admin_ajax_upload_media () {
+    function admin_ajax_save_widget( $widgetData ) {
+        $widgetId = $widgetData['widgetId'];
+        unset($widgetData['widgetId']);
+        
+        static::$settingsModel->saveWidget($widgetId, $widgetData);
+    }
+
+    function admin_ajax_upload_media() {
         // Handle the upload.
         $uploadHandler = new UploadHandler();
     }
@@ -204,8 +229,8 @@ class AdminController extends Controller
                     '/public/js/markitup/jquery.markitup.js',
                     '/public/js/StopWord.js',
                     '/public/js/content.js',
-                    '/public/js/googleAPI.js',
-                    'https://apis.google.com/js/client.js?onload=onClientLoad'
+                    //'/public/js/googleAPI.js',
+                    //'https://apis.google.com/js/client.js?onload=onClientLoad'
                 ),
                 'styles' => array (
                     '/public/fontawesome/css/font-awesome.min.css'
@@ -257,7 +282,6 @@ class AdminController extends Controller
      */
     public function managePosts( $slim ) {
         $posts = static::$postModel->getAll();
-
         $slim->render( 'admin/content/manage-posts.php', array (
                 'page_title' => "Manage Posts",
                 'meta_title' => 'Manage Posts - Admin Dashboard',
@@ -333,16 +357,34 @@ class AdminController extends Controller
     }
 
     function menu( $slim ) {
+        $pages = static::$pageModel->getAll();
+        $primaryMenu = static::$settingsModel->getPrimaryMenu();
+        $secondaryMenu = static::$settingsModel->getSecondaryMenu();
+
         $slim->render( 'admin/appearance/menu.php', array (
                 'page_title' => "Menu Settings",
                 'meta_title' => "Menu Settings",
                 'icon' => 'dashicons dashicons-menu',
-                'settings' => array()
+                'settings' => array(),
+                'pages' => $pages,
+                'primary_menu' => $primaryMenu,
+                'secondary_menu' => $secondaryMenu
             ) );
     }
 
-    function widgets( $slim ) {
-
+    function sidebar( $slim ) {
+        $slim->render( 'admin/appearance/sidebar.php', array (
+                'page_title' => "Sidebar Widgets",
+                'meta_title' => "Sidebar Settings",
+                'icon' => 'dashicons dashicons-align-right',
+                'scripts' => array (
+                    '/public/js/markitup/markdown.js',
+                    '/public/js/markitup/jquery.markitup.js',
+                ),
+                'styles' => array (
+                    '/public/fontawesome/css/font-awesome.min.css'
+                ),
+            ) );
     }
 
     /**
@@ -377,9 +419,10 @@ class AdminController extends Controller
 
     /**
      * Delete a post
-     * 
+     *
      * Delete a post's associated files, give a valid post slug.
-     * @param string  $slug, the slug identifier of the post_data
+     *
+     * @param string  $slug, the slug identifier of the post data
      * @return void
      * @post any html files, .md files, and post summary data are removed.
      */
@@ -388,9 +431,23 @@ class AdminController extends Controller
     }
 
     /**
+     * Delete a page
+     *
+     * Delete a page's associated files, give a valid page slug.
+     *
+     * @param string  $slug, the slug identifier of the page data
+     * @return void
+     * @post any html files, .md files, and page summary data are removed.
+     */
+    function deletePage( $slug ) {
+        static::$pageModel->delete( $slug );
+    }
+
+    /**
      * Delete a media file and its thumbnail.
      *
      * Check if a media file exists, given the file name, and delete the file and its thumbnail.
+     *
      * @param string  $filename, the file name of the media file within media directory.
      * @return void
      * @post the media file and its associated thumbnail are deleted from the server.
@@ -399,16 +456,16 @@ class AdminController extends Controller
         // Define the path to the file. Does not need resolving.
         $filePath = PUBLICPATH . "media/$filename";
         // Check if file exists.
-        if (is_readable($filePath)) {
+        if ( is_readable( $filePath ) ) {
             // Delete the file.
-            unlink($filePath);
+            unlink( $filePath );
         }
         // Define the path to the file's thumbnail.
         $thumbPath = PUBLICPATH . "media/thumbnail/$filename";
         // Check if thumbnail exists.
-        if (is_readable($thumbPath)) {
+        if ( is_readable( $thumbPath ) ) {
             // Delete the thumbnail.
-            unlink($thumbPath);
+            unlink( $thumbPath );
         }
     }
 
