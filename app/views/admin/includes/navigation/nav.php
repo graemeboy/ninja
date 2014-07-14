@@ -30,6 +30,9 @@
             'settings-site' => array (
                 'title' => 'Site Settings',
             ),
+            'settings-admin' => array (
+                'title' => 'Admin Settings',
+            ),
         )
     );
     // Define menu items for adding posts and pages
@@ -177,10 +180,10 @@ function print_menu_item ($href, $title, $icon) {
  * @return none
  */
 function print_menu_subtitle ($subtitle, $icon, $first_link) { ?>
-    <a href="<?php echo $first_link ?>" data-menu="<?php echo strtolower($subtitle) ?>" class="nav-menu-title"><?php          if ($icon !== '') { ?>
+    <a href="<?php echo $first_link ?>" style="text-align:center" data-menu="<?php echo strtolower($subtitle) ?>" class="nav-menu-title"><?php          if ($icon !== '') { ?>
         <span class="admin-menu-icon <?php echo $icon ?>"></span>
     <?php } // if
-    echo $subtitle ?></a>
+    //echo $subtitle ?></a>
 <?php } // print_menu_subtitle (string)
 
 function print_menu_list_divider() {

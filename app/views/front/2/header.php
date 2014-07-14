@@ -1,5 +1,6 @@
-<?php
-	extract($post_data);
+<?php 
+	extract($post_data); 
+	extract($site_settings); 
 ?>
 <!DOCTYPE html>
 <html>
@@ -54,23 +55,29 @@
 	#copyright {
 		text-align: center;
 	}
+	.social-pages-icon {
+		font-size: 36px;
+		margin-right: 15px;
+	}
 </style>
 </head>
 <body>
-
     <header>
         <div id="header-container" class="container">
-            <div id="logo" class="col-sm-5">
+            <div id="logo" class="col-sm-3">
                 <img id="header-logo" src="<?php echo $logo_url ?>">
             </div>
             <div id="menu-wrapper" class="col-sm-7">
-            	<div id="menu">
-            		Menu goes here
-            	</div>
+            	<ul id="menu" style="padding-left:0">
+            		<?php
+            			foreach ($primary_menu as $slug=>$title) {
+            				echo "<li style='list-style:none;display:inline-block;padding: 0 15px'><a href=\"$slug\">$title</a></li>";
+            			}
+            		?>
+            	</ul>
             </div>        
         </div>
     </header>
     <hr>
-
         <div id="page-content" class="container">
- 			<div id="left-content" class="col-sm-9">
+ 			<div id="left-content" class="col-sm-7 col-sm-offset-1">

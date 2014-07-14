@@ -32,7 +32,6 @@
             font-family: 'Helvetica Neue', sans-serif;
             font-weight: 300;
             color: white;
-            background:  linear-gradient(to bottom, #668188 0%,#3c5760  100%);
         }
         h1,h2,h3,h4 {
             font-weight: 100;
@@ -120,9 +119,7 @@
         .form-control:-ms-input-placeholder { /* Internet Explorer 10+ */
             color:    #fff;
         }
-        #admin-header-wrap {
-            background:  linear-gradient(to right, #668188 0%,#3c5760  100%);
-        }
+        
         #admin-header-wrap {
             background-color: #333;
             padding: 10px;
@@ -156,8 +153,7 @@
             font-size: 16px;
         }
         .nav-menu-item {
-            padding: 5px;
-            margin: 5px 0 5px 10px;
+
         }
         .nav-menu-list {
             padding-right:0;   
@@ -165,19 +161,24 @@
         .nav-menu-title {
             display: block;
             width: 100%;
-            padding: 10px 10px 10px 20px;
+            padding: 15px 10px 10px 20px;
+            height: 65px;
         }
         .nav-inner-menu {
-            padding: 0 0 5px 0;
-            margin-left: 36px;
+            padding: 0;
             display: none;
+            text-align: center;
         }
         .inner-menu-active {
             /*background-color: #2f3130;*/
             background: rgba(0, 0, 0, 0.1);
         }
         .nav-inner-menu a {
-            font-size: 14px   
+            font-size: 15px;
+            display: inline-block;
+            padding: 10px 5px 10px 15px;
+            width:100%;
+            /*border-bottom: 1px solid rgba(0,0,0,0.05);*/
         }
         .nav-inner-menu a:hover, a.nav-menu-title:hover  {
             text-decoration: none;
@@ -186,14 +187,16 @@
             background: rgba(0, 0, 0, 0.1);
         }
         .nav-menu-item a:hover {
-            color: #daf2fa !important;
+            background-color: rgba(255,255,255,0.1);
         }
         .nav-item-active {
             border-right: 5px solid #5dd680;
-            font-weight: 500;
+            font-weight: 400;
+            background:rgba(255,255,255,0.1);
         }
         .admin-menu-icon {
             margin-right: 15px;
+            font-size: 35px;
         }
         #dashboard-splash {
             background-color: #fff;
@@ -221,6 +224,9 @@
             border-radius: 0;
             border: none;
             font-weight: 300;
+        }
+        .btn-success:hover, .btn-success:active, .btn-success:focus {
+            background:rgba(255,255,255,0.3);
         }
         
 /*
@@ -291,7 +297,7 @@
             padding: 11px 20px;
             font-size: 16px;
             line-height: 18px;
-            background: rgba(62,89,98,0.7);
+            background: rgba(0,0,0,0.3);
             margin: 5px 0;
             display: inline-block;
             position:fixed;top:30px;left:40%;
@@ -339,25 +345,91 @@
           */
          
          textarea.widget-textarea {
-            height: 105px;
+            height: 187px;
+         }
+
+         /*
+            Theme Settings
+          */
+         
+
+
+         /*
+            Sea Foam Theme
+          */
+         body.samurai {
+            background: linear-gradient(to bottom, #668188 0%,#3c5760 100%);
+         }
+        body.samurai #admin-header-wrap {
+            background:  linear-gradient(to right, #668188 0%,#3c5760  100%);
+        }
+
+         /*
+            Ninja Theme
+          */
+         body.ninja {
+            background: linear-gradient(to bottom, #474747 0%,#242424 100%);
+         }
+         body.ninja #admin-header-wrap {
+            background: linear-gradient(to right, #474747 0%,#242424 100%);
+         }
+
+         body.geisha {
+            background: linear-gradient(to bottom, #FF5E5E 0%,rgba(168, 24, 168, 0.79) 100%);
+         }
+         body.geisha #admin-header-wrap {
+            background: linear-gradient(to right, #FF5E5E 0%,rgba(168, 24, 168, 0.79) 100%);
+         }
+
+         body.tiger {
+            background: linear-gradient(to bottom, rgba(255, 199, 79, 1) 0%, #665B4E 100%);
+         }
+        body.tiger #admin-header-wrap {
+            background: linear-gradient(to right, rgba(255, 199, 79, 1) 0%, #665B4E 100%);
+            /*background:linear-gradient(to bottom, #55 0%, #333 100%);*/
+         }
+
+         body.emperor {
+            background: linear-gradient(to bottom, #3E315F 0%,rgba(112, 97, 165, 0.79) 100%);
+         }
+
+         body.emperor #admin-header-wrap {
+            background: linear-gradient(to right, #3E315F 0%,rgba(112, 97, 165, 0.79) 100%);
+         }
+
+         body.zen {
+            background: linear-gradient(to bottom, rgba(89, 235, 255, 1) 0%, #3E5D64 100%);
+         }
+
+         body.zen #admin-header-wrap {
+            background: linear-gradient(to right, rgba(79,185,200, 0.3) 0%, rgba(79,185,200, 0) 100%);
+         }
+
+         body.jade {
+            background: linear-gradient(to bottom, rgba(121, 175, 123, 1) 0%, #1A3D20 100%);
+         }
+
+         body.jade #admin-header-wrap {
+            background: linear-gradient(to right, rgba(67,110,71, 0.4) 0%, rgba(67,110,71, 0) 100%);
          }
     </style>
 </head>
 
-<body>
+<body class="<?php echo $admin_theme ?>">
     <div id="admin-wrap">
-        <div id="admin-header-wrap">
+        <!-- <div id="admin-header-wrap">
             <div id="admin-header-left" class="container-fluid pull-left">
-                <span id="admin-head-title"><?php echo SITETITLE ?></span>
+                <span id="admin-head-title" class="site-title"><a href="/"><?php echo $site_title ?></a> - <?php echo $site_subtitle ?></span>
             </div>
             <div id="admin-header-right" class="container-fluid pull-right">
                 <a href="" class="admin-logout-link"><i class="dashicons dashicons-migrate" style="font-size:1.3em;height:auto;width:auto;"></i> Logout</a>
             </div>
             <div class="clearfix"></div>
-        </div>
+        </div> -->
         <!-- #admin-header-wrap -->
 
-        <div id="admin-menu" class="col-sm-2">
+        <div id="admin-menu" class="col-sm-1">
             <?php include_once( 'navigation/nav.php') ?>
         </div>
-        <div id="admin-content" class="col-sm-10">
+        <div id="admin-content" class="col-sm-11">
+            <div class="container-fluid">

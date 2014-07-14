@@ -7,39 +7,100 @@
 
     $val = "";
 
-    function printWidgetHead ($title, $id) { ?>
+    function printWidgetHead ($widget_settings, $title, $id) { 
+    	if (!empty($widget_settings['active']) && 
+    			trim ($widget_settings['active'] === 'on')) {
+    		$active = true;
+    	} else {
+    		$active = false;
+    	}
+    	?>
     	<div class="panel-heading">
     		<div class="checkbox" style="margin:0">
     			<label class="form-label">
-    				<input type="checkbox" name="include-<?php echo $id ?>" value="on" id="include-<?php echo $id ?>"> <?php echo $title ?>
+    				<input type="checkbox" name="active" value="on" id="include-<?php echo $id ?>" <?php
+    					if ($active) {
+    						echo "checked";
+    					}
+    				?>> <?php echo $title ?>
     			</label>
     		</div>
     	</div>
     	<!-- .panel-heading -->
     <?php }
 
-    function printWidgetTitleOption($id) { ?>
-    	<div class="form-group">
-			<label class="control-label">Widget Title (Optional)</label>
-			<input type="text" id="widget-title-<?php echo $id ?>" class="form-control">
+    function printWidgetTitleOption($widget_settings, $id) {
+    	// I do the check for the title within the function for convenience.
+    	// Otherwise, it would have to go in the startWidget function.
+    	if (!empty($widget_settings['widget-title'])) {
+    		$title = $widget_settings['widget-title'];
+    	} else {
+    		$title = "";
+    	}
+    	?>
+    	<div class="row">
+	    	<div class="col-md-8">
+		    	<div class="form-group">
+					<label class="control-label">Widget Title (Optional)</label>
+					<input type="text" name="widget-title" value="<?php echo $title ?>" id="widget-title-<?php echo $id ?>" class="form-control">
+				</div>
+			</div>
+    <?php printOrderOption($widget_settings, $id);
+	}
+
+    function printOrderOption($widget_settings, $id) { 
+    	if (isset($widget_settings['order'])) {
+    		$order = $widget_settings['order'];
+    	} else {
+    		$order = '';
+    	}
+    	$orderOptions = array (
+    		0 => 'First',
+    		1 => 'Second',
+    		2 => 'Third',
+    		3 => 'Fourth',
+    		4 => 'Fifth'
+    	);
+    	?>
+		<div class="col-md-4">
+				<div class="form-group">
+					<label class="control-label">Order</label>
+					<select class="form-control" name="widget-order">
+						<?php
+						foreach ($orderOptions as $val=>$label) {
+							echo "<option value='$val'";
+							// $val is int, $order is string.
+							if ($val == $order) {
+								echo 'selected';
+							}
+							echo ">$label</option>";
+						}
+						?>
+					</select>
+				</div>
+			</div>
 		</div>
     <?php }
 
-    function printWidgetCheckbox($class, $value, $title) { ?>
+    function printWidgetCheckbox($active, $class, $value, $title) { ?>
     	<div class="checkbox">
 			<label class="control-label">
-				<input type="checkbox" name="<?php echo $class ?>" class="<?php echo $class ?>" value="<?php echo $value ?>"> <?php echo $title ?>
+				<input type="checkbox" name="<?php echo $class ?>[]" class="<?php echo $class ?>" value="<?php echo $value ?>" <?php
+					if ($active === 'yes') {
+						echo "checked";
+					}
+				?>> <?php echo $title ?>
 			</label>
 		</div>
     <?php }
 
-    function startWidget($id, $title) { ?>
+    function startWidget($widget_settings, $id, $title) {  ?>
 		<div class="col-sm-4">
 			<form id="widget-form-<?php echo $id ?>">
 		    <div class="panel admin-panel">
-		    	<?php printWidgetHead ($title, $id) ?>
+		    	<?php printWidgetHead ($widget_settings, $title, $id) ?>
 		    	<div class="panel-body">
-		    		<?php printWidgetTitleOption($id);
+		    		<?php printWidgetTitleOption($widget_settings, $id);
 	}
 
     function endWidget($id) {
@@ -55,10 +116,27 @@
     	echo "</div>";
     }
 
-    function printWidgetTextInput($id, $val) {
+    function printWidgetTextInput($widget_settings, $id) {
+    	if (!empty($widget_settings[$id])) {
+    		$val = $widget_settings[$id];
+    	} else {
+    		$val = "";
+    	}
     	?>
     	<input type="text" id="<?php echo $id ?>" name="<?php echo $id ?>" value="<?php echo $val ?>" class="form-control">
     	<?php
+    }
+
+    function printNetworksOptions($networks, $widget_settings, $id, $checkboxClass) {
+		foreach ($networks as $networkId=>$title) {
+			if (!empty($widget_settings['networks'])
+				&& in_array($networkId, $widget_settings['networks'])) {
+				$active = 'yes';
+			} else {
+				$active = 'no';
+			}
+			printWidgetCheckbox($active, $checkboxClass, $networkId, $title);
+		}
     }
 
     /**
@@ -83,37 +161,50 @@
     <div class="row">
     	<?php 
     	// About Widget
-    	startWidget('about', 'About'); ?>
+    	$id = 'about';
+    	$this_widget_settings = $widget_settings[$id];
+    	if (!empty($this_widget_settings['text'])) {
+    		$aboutText = $this_widget_settings['text'];
+    	} else {
+    		$aboutText = "";
+    	}
+    	startWidget($widget_settings[$id], $id, 'About'); ?>
     		<div class="form-group">
     			<label class="control-label">About Text</label>
-    			<textarea id="about-text" value="" name="about-text" class="form-control widget-textarea"></textarea>
+    			<textarea id="about-text" name="text" class="form-control widget-textarea"><?php
+    				echo $aboutText;
+    			?></textarea>
     		</div>
-    	<?php 
-    	endWidget('about');
+    	<?php
+    	endWidget($id);
 
     	// Social Networking Pages Widget
-    	startWidget('social-pages', 'Social Networking Pages');
+    	$id = 'social-pages';
+    	$this_widget_settings = $widget_settings[$id];
+    	startWidget($this_widget_settings, $id, 'Social Networking Pages');
 		?>
 		<p>Add a link to any pages you want to promote:</p>
 		<div class="form-group">
 			<label class="control-label">Facebook URL</label>
-			<?php printWidgetTextInput('social-pages-facebook', $val); ?>
+			<?php printWidgetTextInput($this_widget_settings, 'facebook-url', $val); ?>
 		</div>
 		<div class="form-group">
 			<label class="control-label">Twitter URL</label>
-			<?php printWidgetTextInput('social-pages-twitter', $val); ?>
+			<?php printWidgetTextInput($this_widget_settings, 'twitter-url', $val); ?>
 		</div>
 		<div class="form-group">
 			<label class="control-label">Google+ URL</label>
-			<?php printWidgetTextInput('social-pages-googleplus', $val); ?>
+			<?php printWidgetTextInput($this_widget_settings, 'googleplus-url', $val); ?>
 		</div>
 		<?php 
-		endWidget('social-pages');
+		endWidget($id);
 
 		// Social Sharing Widget
-		startWidget('social-sharing', 'Social Network Sharing');
+		$id = 'social-sharing';
+		$this_widget_settings = $widget_settings[$id];
+		startWidget($this_widget_settings, $id, 'Social Network Sharing');
 		echo "<p>Sharing buttons to appear:</p>";
-		$checkboxClass = "social-sharing";
+		$checkboxClass = "networks";
 		// Define all social networks, id=>title
 		$socialNetworks = array (
 			'facebook' => 'Facebook',
@@ -124,19 +215,19 @@
 			'reddit' => 'Reddit'
 		);
 		// Print the checkboxes for all social networks.
-		foreach ($socialNetworks as $id=>$title) {
-			printWidgetCheckbox($checkboxClass, $id, $title);
-		}
-		endWidget('social-sharing');
+		printNetworksOptions($socialNetworks, $this_widget_settings, $id, $checkboxClass);
+		endWidget($id);
 		?>
 	</div>
 	<!-- .row -->
 	<div class="row">
 		<?php
 		// Social Metrics Widget
-		startWidget('plain-text', 'Social Metrics');
+		$id = 'social-metrics';
+		$this_widget_settings = $widget_settings[$id];
+		startWidget($this_widget_settings, $id, 'Social Metrics');
 		echo "<p>Show how many likes or shares you have for your pages, for these networks:</p>";
-		$checkboxClass = "social-metrics";
+		$checkboxClass = "networks";
 
 		// Define all social networks that allow easy access to metrics, format: id=>title
 		$socialNetworks = array (
@@ -144,18 +235,25 @@
 			'twitter' => 'Twitter'
 		);
 		// Print the checkboxes for all social networks.
-		foreach ($socialNetworks as $id=>$title) {
-			printWidgetCheckbox($checkboxClass, $id, $title);
-		}
-		endWidget('social-metric', 'Social Metrics');
-		startWidget('plain-text', 'Plain Text');
+		printNetworksOptions($socialNetworks, $this_widget_settings, $id, $checkboxClass);
+		endWidget($id);
+
+		// Plain text widget
+		$id = 'plain-text';
+		$this_widget_settings = $widget_settings[$id];
+		if (!empty($this_widget_settings['text'])) {
+    		$text = $this_widget_settings['text'];
+    	} else {
+    		$text = "";
+    	}
+		startWidget($this_widget_settings, $id, 'Plain Text');
 		?>
 		<div class="form-group">
 			<label class="control-label">Text</label>
-			<textarea id="plain-text-text" name="plain-text-text" value="" class="form-control widget-textarea"></textarea>
+			<textarea id="plain-text-text" name="text" class="form-control widget-textarea"><?php echo $text ?></textarea>
 		</div>
 		<?php
-		endWidget('plain-text');
+		endWidget($id);
 		?>
 	</div>
 

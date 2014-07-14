@@ -1,7 +1,7 @@
 <?php include_once ('header.php') ?>
 
-<h3><?php echo $title ?></h3>
-<div class="container" style="margin:30px 0 0 30px">
+<h3><?php printTitle('h3', $title) ?></h3>
+<div>
 	<?php echo $content ?>
 </div>
 

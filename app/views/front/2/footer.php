@@ -7,7 +7,11 @@
     <div id="footer" class="container">
         <footer>
         	<div class="container">
-                <p>Put a footer menu here</p>
+                <ul class="menu-secondary"><?php
+                    foreach ($secondary_menu as $slug=>$title) { ?>
+                        <li style="list-style:none;display:inline-block;padding-right:10px"><a href="<?php echo $slug ?>"><?php echo $title ?></a></li>
+                    <?php }
+                ?></ul>
     		</div>
         </footer>
         <div id="copyright"><?php echo $copyright ?></div>

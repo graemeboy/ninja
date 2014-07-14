@@ -9,13 +9,13 @@ $router->get( '/:slug', function ( $slug ) use ( $front, $router ) {
 		// Check if post exists.
 		$postModel = new \ninja\Models\Post();
 		if ( $postModel->isPost( $slug ) ) {
-			$front->post( $slug, $router );
+			$front->post( $slug );
 		} else {
 			// Check Pages
 			$pageModel = new \ninja\Models\Page();
 			if ( $pageModel->isPage( $slug ) ) {
 				// Found a page with this slug.
-				$front->page( $slug, $router );
+				$front->page( $slug );
 			} else {
 				// Return 404
 				$router->notFound();

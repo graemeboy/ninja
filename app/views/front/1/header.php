@@ -1,5 +1,6 @@
 <?php
-	extract($post_data);
+	extract($post_data); 
+	extract($site_settings); 
 ?>
 <!DOCTYPE html>
 <html>

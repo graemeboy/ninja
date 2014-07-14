@@ -1,58 +1,62 @@
 <?php namespace ninja\Routes;
 
 // Admin Index
-$router->get( '/admin', function () use ( $admin, $router ) {
-		$admin->index( $router );
+$router->get( '/admin', function () use ( $admin ) {
+		$admin->index( );
 	} );
-$router->get( '/admin/', function () use ( $admin, $router ) {
-		$admin->index( $router );
+$router->get( '/admin/', function () use ( $admin ) {
+		$admin->index( );
+		exit;
 	} );
 // Admin Dashboard
-$router->get( '/admin/dashboard', function () use ( $admin, $router ) {
-		$admin->dashboard( $router );
+$router->get( '/admin/dashboard', function () use ( $admin ) {
+		$admin->dashboard( );
 	} );
 // Add Posts and Pages and Media
-$router->get( '/admin/add-post', function () use ( $admin, $router ) {
-		$admin->addPost( $router );
+$router->get( '/admin/add-post', function () use ( $admin ) {
+		$admin->addPost( );
 	} );
-$router->get( '/admin/add-page', function () use ( $admin, $router ) {
-		$admin->addPage( $router );
+$router->get( '/admin/add-page', function () use ( $admin ) {
+		$admin->addPage( );
 	} );
-$router->get( '/admin/add-media', function () use ( $admin, $router ) {
-		$admin->addMedia( $router );
+$router->get( '/admin/add-media', function () use ( $admin ) {
+		$admin->addMedia( );
 	} );
 // Manage Posts, Pages, and Media
-$router->get( '/admin/edit-posts/:slug', function ( $slug ) use ( $admin, $router ) {
-		$admin->editPost( $router, $slug );
+$router->get( '/admin/edit-posts/:slug', function ( $slug ) use ( $admin ) {
+		$admin->editPost( $slug );
 	} );
-$router->get( '/admin/edit-posts', function () use ( $admin, $router ) {
-		$admin->managePosts( $router );
+$router->get( '/admin/edit-posts', function () use ( $admin ) {
+		$admin->managePosts( );
 	} );
-$router->get( '/admin/edit-pages/:slug', function ( $slug ) use ( $admin, $router ) {
-		$admin->editPage( $router, $slug );
+$router->get( '/admin/edit-pages/:slug', function ( $slug ) use ( $admin ) {
+		$admin->editPage( $slug );
 	} );
-$router->get( '/admin/edit-pages', function () use ( $admin, $router ) {
-		$admin->managePages( $router );
+$router->get( '/admin/edit-pages', function () use ( $admin ) {
+		$admin->managePages( );
 	} );
-$router->get( '/admin/manage-media', function () use ( $admin, $router ) {
-		$admin->manageMedia( $router );
+$router->get( '/admin/manage-media', function () use ( $admin ) {
+		$admin->manageMedia( );
 	} );
 
 // Settings Pages
-$router->get( '/admin/settings-site', function () use ( $admin, $router ) {
-		$admin->settingsSite( $router );
+$router->get( '/admin/settings-site', function () use ( $admin ) {
+		$admin->settingsSite( );
+	} );
+$router->get( '/admin/settings-admin', function () use ( $admin ) {
+		$admin->settingsAdmin ( );
 	} );
 // Appearance Settings - Theme and Styles
-$router->get( '/admin/layout-style', function () use ( $admin, $router ) {
-		$admin->layoutStyle( $router );
+$router->get( '/admin/layout-style', function () use ( $admin ) {
+		$admin->layoutStyle( );
 	} );
 // Appearance Settings - Menu
-$router->get( '/admin/menu', function () use ( $admin, $router ) {
-		$admin->menu( $router );
+$router->get( '/admin/menu', function () use ( $admin ) {
+		$admin->menu( );
 	} );
 // Appearance Settings - Widgets
-$router->get( '/admin/sidebar', function () use ( $admin, $router ) {
-		$admin->sidebar( $router );
+$router->get( '/admin/sidebar', function () use ( $admin ) {
+		$admin->sidebar( );
 	} );
 // Delete post
 $router->get( '/admin/delete-post/:slug', function ( $slug ) use ( $admin, $router ) {

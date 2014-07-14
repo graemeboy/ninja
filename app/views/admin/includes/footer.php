@@ -1,4 +1,5 @@
 </div>
+</div>
 <!-- .container -->
 </div>
 <!-- #admin-content .col-sm-9 -->

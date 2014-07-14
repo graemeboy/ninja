@@ -23,6 +23,7 @@ function printMediaRows () {
 
 			echo "<tr>";
 			echo "<td>$filename</td>";
+			echo "<td>{$filepath}thumbnail/$filename</td>";
 			echo "<td>";
 			// Show thumbnail, if one exists.
 			if (is_readable($filepath . "thumbnail/$filename")) {
@@ -43,6 +44,7 @@ function printMediaRows () {
     <table class="table admin-table">
         <thead>
             <th>Filename</th>
+            <th>URL</th>
             <th>File preview</th>
             <th colspan="4" style="text-align:center">Actions</th>
         </thead>

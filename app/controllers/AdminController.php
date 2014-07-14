@@ -60,6 +60,8 @@ class AdminController extends Controller
         'default', '1', '2'
     );
 
+    static $app;
+
     /**
      * The array of possible styles, provided by the package.
      *
@@ -75,12 +77,25 @@ class AdminController extends Controller
 
 
     public function __construct() {
+        global $router;
+
         // Init post model.
         static::$postModel = new Post();
         // Init page model.
         static::$pageModel = new Page();
         // Init settings model.
         static::$settingsModel = new Settings();
+
+        // Set the site title
+        $siteTitle = static::$settingsModel->getSiteTitle();
+        $siteSubtitle = static::$settingsModel->getSiteSubtitle();
+        // Set the admin theme
+        $adminTheme = static::$settingsModel->getAdminTheme();
+
+        static::$app = $router;
+        static::$app->view->setData( 'site_title', $siteTitle );
+        static::$app->view->setData( 'site_subtitle', $siteSubtitle );
+        static::$app->view->setData( 'admin_theme', $adminTheme );
     }
     /**
      * The URL requested by "/admin" or "/admin/"
@@ -88,7 +103,6 @@ class AdminController extends Controller
      * Because no specific page in the admin is requested,
      * redirect the user to the dashboard.
      *
-     * @param Object  @app the Slim framework app that provides redirect.
      */
     public function index( $app ) {
         // If logged in, redirect to the dashboard.
@@ -155,7 +169,7 @@ class AdminController extends Controller
     function admin_ajax_save_widget( $widgetData ) {
         $widgetId = $widgetData['widgetId'];
         unset($widgetData['widgetId']);
-        
+
         static::$settingsModel->saveWidget($widgetId, $widgetData);
     }
 
@@ -180,6 +194,14 @@ class AdminController extends Controller
         }
     }
 
+    function admin_ajax_save_site_settings( $data ) {
+        static::$settingsModel->saveSiteSettings( $data );
+    }
+
+    function admin_ajax_save_admin_settings ( $data ) {
+        static::$settingsModel->saveAdminSettings( $data );
+    }
+
     /**
      * Update the site's style settings.
      *
@@ -200,8 +222,8 @@ class AdminController extends Controller
     /**
      * Render the Admin Dashboard
      */
-    public function dashboard( $slim ) {
-        $slim->render( 'admin/dashboard.php', array (
+    public function dashboard( ) {
+        static::$app->render( 'admin/dashboard.php', array (
                 'head_title' => "Admin Dashboard",
                 'meta_title' => 'Admin Dashboard'
             ) );
@@ -214,14 +236,14 @@ class AdminController extends Controller
     /**
      * Render the Add Post page in the admin area
      */
-    public function addPost( $slim ) {
+    public function addPost( ) {
         $post_data = array (
             'title' => '',
             'content' => '',
             'tags' => array (),
             'slug' => ''
         );
-        $slim->render( 'admin/content/add-post.php', array (
+        static::$app->render( 'admin/content/add-post.php', array (
                 'page_title' => "Add a Post",
                 'meta_title' => 'Add a Post - Admin Dashboard',
                 'scripts' => array (
@@ -243,14 +265,14 @@ class AdminController extends Controller
     /**
      * Render the Add Page page in admin
      */
-    public function addPage( $slim ) {
+    public function addPage() {
         $page_data = array (
             'title' => '',
             'content' => '',
             'tags' => array (),
             'slug' => ''
         );
-        $slim->render( 'admin/content/add-page.php', array (
+        static::$app->render( 'admin/content/add-page.php', array (
                 'page_title' => "Add a Page",
                 'meta_title' => 'Add a Page - Admin Dashboard',
                 'scripts' => array (
@@ -269,8 +291,8 @@ class AdminController extends Controller
     /**
      * Render the Add Media page in admin
      */
-    public function addMedia( $slim ) {
-        $slim->render( 'admin/content/add-media.php', array (
+    public function addMedia() {
+        static::$app->render( 'admin/content/add-media.php', array (
                 'page_title' => "Add Media",
                 'meta_title' => 'Add Media - Admin Dashboard',
             ) );
@@ -280,9 +302,9 @@ class AdminController extends Controller
      *  Manage Content Controllers
      *-------------------------------
      */
-    public function managePosts( $slim ) {
+    public function managePosts() {
         $posts = static::$postModel->getAll();
-        $slim->render( 'admin/content/manage-posts.php', array (
+        static::$app->render( 'admin/content/manage-posts.php', array (
                 'page_title' => "Manage Posts",
                 'meta_title' => 'Manage Posts - Admin Dashboard',
                 'styles' => array (
@@ -295,10 +317,10 @@ class AdminController extends Controller
     /**
      * Render the Add Page page in admin
      */
-    public function managePages( $slim ) {
+    public function managePages( ) {
         $pages = static::$pageModel->getAll();
 
-        $slim->render( 'admin/content/manage-pages.php', array (
+        static::$app->render( 'admin/content/manage-pages.php', array (
                 'page_title' => "Manage Pages",
                 'meta_title' => 'Manage Posts - Admin Dashboard',
                 'styles' => array (
@@ -312,12 +334,12 @@ class AdminController extends Controller
      *  Edit Content Controllers
      *-------------------------------
      */
-    public function editPost( $slim, $slug ) {
+    public function editPost( $slug ) {
         $postData = static::$postModel->getSummary( $slug );
         $postMarkdown = static::$postModel->getMarkdown( $slug );
         $postData['content'] = $postMarkdown;
 
-        $slim->render( 'admin/content/add-post.php', array (
+        static::$app->render( 'admin/content/add-post.php', array (
                 'page_title' => "Edit Post",
                 'meta_title' => 'Edit Post - Admin Dashboard',
                 'post_data' => $postData,
@@ -334,12 +356,12 @@ class AdminController extends Controller
             ) );
     }
 
-    public function editPage( $slim, $slug ) {
+    public function editPage( $slug ) {
         $pageData = static::$pageModel->getSummary( $slug );
         $pageMarkdown = static::$pageModel->getMarkdown( $slug );
         $pageData['content'] = $pageMarkdown;
 
-        $slim->render( 'admin/content/add-page.php', array (
+        static::$app->render( 'admin/content/add-page.php', array (
                 'page_title' => "Edit Page",
                 'meta_title' => 'Edit Page - Admin Dashboard',
                 'page_data' => $pageData,
@@ -356,12 +378,12 @@ class AdminController extends Controller
             ) );
     }
 
-    function menu( $slim ) {
+    function menu( ) {
         $pages = static::$pageModel->getAll();
         $primaryMenu = static::$settingsModel->getPrimaryMenu();
         $secondaryMenu = static::$settingsModel->getSecondaryMenu();
 
-        $slim->render( 'admin/appearance/menu.php', array (
+        static::$app->render( 'admin/appearance/menu.php', array (
                 'page_title' => "Menu Settings",
                 'meta_title' => "Menu Settings",
                 'icon' => 'dashicons dashicons-menu',
@@ -372,8 +394,9 @@ class AdminController extends Controller
             ) );
     }
 
-    function sidebar( $slim ) {
-        $slim->render( 'admin/appearance/sidebar.php', array (
+    function sidebar( ) {
+        $widgetSettings = static::$settingsModel->getWidgetSettings();
+        static::$app->render( 'admin/appearance/sidebar.php', array (
                 'page_title' => "Sidebar Widgets",
                 'meta_title' => "Sidebar Settings",
                 'icon' => 'dashicons dashicons-align-right',
@@ -384,15 +407,15 @@ class AdminController extends Controller
                 'styles' => array (
                     '/public/fontawesome/css/font-awesome.min.css'
                 ),
+                'widget_settings' => $widgetSettings,
             ) );
     }
 
     /**
      * function layoutStyle
      *
-     * @param slim
      */
-    function layoutStyle( $slim ) {
+    function layoutStyle( ) {
         $settings = static::$settingsModel->getAppearanceSettings();
         // Set some defaults in case mandatory variables are not set.
         if ( empty( $settings['layout'] ) ) {
@@ -404,7 +427,7 @@ class AdminController extends Controller
 
 
 
-        $slim->render( 'admin/appearance/layoutStyle.php', array (
+        static::$app->render( 'admin/appearance/layoutStyle.php', array (
                 'page_title' => "Layout and Style",
                 'meta_title' => "Layout and Style - Admin Dashboard",
                 'scripts' => array (
@@ -472,8 +495,8 @@ class AdminController extends Controller
     /**
      * Render the Add Media page in admin
      */
-    function manageMedia( $slim ) {
-        $slim->render( 'admin/content/manage-media.php', array (
+    function manageMedia( ) {
+        static::$app->render( 'admin/content/manage-media.php', array (
                 'page_title' => "Manage Media",
                 'meta_title' => 'Manage Media - Admin Dashboard'
             ) );
@@ -483,10 +506,21 @@ class AdminController extends Controller
      * Settings Pages
      *-------------------------------
      */
-    function settingsSite( $slim ) {
-        $slim->render( 'admin/settings/settings-site.php', array (
+    function settingsSite() {
+        $siteSettings = static::$settingsModel->getSiteSettings();
+
+        static::$app->render( 'admin/settings/settings-site.php', array (
                 'page_title' => "Site Settings",
-                'meta_title' => 'Site Settings - Admin Dashboard'
+                'meta_title' => 'Site Settings - Admin Dashboard',
+                'site_settings' => $siteSettings,
             ) );
     }
+
+    function settingsAdmin( ) {
+        static::$app->render( 'admin/settings/settings-admin.php', array (
+                'page_title' => "Admin Settings",
+                'meta_title' => 'Admin Settings - Admin Dashboard'
+            ) );
+    }
+
 } // class AdminController

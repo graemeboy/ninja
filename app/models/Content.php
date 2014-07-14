@@ -38,11 +38,39 @@ abstract class Content {
             $json_data = file_get_contents( $this->summaryPath );
             // Return data as a php array if there are any.
             if ( !empty( $json_data ) ) {
-                return json_decode( $json_data, true );
+                $contentArray = json_decode( $json_data, true );
+                // Return an ordered array
+                return $this->orderByLastEdited($contentArray);
             }
         }
         // There are no posts or pages yet, return an empty array.
         return array();
+    }
+
+    function getTitle( $slug ) {
+        $content = $this->getAll();
+        return $content[$slug]['title'];
+    }
+
+    function orderByLastEdited ($array) {
+        if (!empty($array)) {
+            uasort($array, array($this, 'lastEditedComparison'));
+        }
+        return $array;
+    }
+    function lastEditedComparison ($a, $b) {
+        if (!empty($a['last_edited']) &&
+            !empty($b['last_edited'])) {
+            $time_a = strtotime($a['last_edited']);
+            $time_b = strtotime($b['last_edited']);
+
+            if ($time_a === $time_b) {
+                return 0;
+            }
+            return ($time_a > $time_b) ? -1 : 1;
+        } else {
+            return 1;
+        }
     }
 
     /**
@@ -171,7 +199,13 @@ abstract class Content {
      * @param array   $postData, all data for the post.
      */
     function save( $contentData ) {
-        $slug = $contentData['slug'];
+        if (!empty($contentData['slug'])
+                && trim($contentData['slug']) !== '') {
+            $slug = $contentData['slug'];
+        } else {
+            // Randomly generate a slug
+            $slug = generateSlug();
+        }
         // Extract markdown content.
         $markdown = $contentData['content'];
         // Convert markdown content to HTML
@@ -193,6 +227,13 @@ abstract class Content {
         $this->saveHTMLToFile( $htmlContent, $slug );
         // // Save Markdown
         $this->saveMarkdownToFile( $markdown, $slug );
+    }
+
+    function generateSlug () {
+        $words = array(
+            'ninja', 'samauri', 'jade', 'warrior', 'tiger'
+        );
+        return $words[array_rand($words)];
     }
 
     /**

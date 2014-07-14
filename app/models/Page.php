@@ -53,7 +53,7 @@ class Page extends Content
     function save ($pageData) {
         parent::save($pageData);
         // Now, add it to the primary and secondary menus.
-        $settingsModel = new Settings();
-        $settingsModel->addMenuItem('primary', $pageData['slug'], $pageData['title']);
+        //$settingsModel = new Settings();
+        //$settingsModel->addMenuItem('primary', $pageData['slug'], $pageData['title']);
     }
 } // class pageModel

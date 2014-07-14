@@ -4,7 +4,9 @@ use ninja\Controllers\AdminController as AdminController;
 use ninja\Controllers\FrontController as FrontController;
 
 //echo "Creating new Slim object<br/>";
-$router = new \Slim\Slim();
+// $router = new \Slim\Slim();
+global $router;
+
 $router->config( array(
         'debug' => true,
         'templates.path' => APPPATH . 'views/'

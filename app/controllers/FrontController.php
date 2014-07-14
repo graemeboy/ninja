@@ -2,8 +2,9 @@
 
 use ninja\Models\Post;
 use ninja\Models\Page;
+use ninja\Models\Settings;
 
-require_once BASEPATH . 'admin-functions.php';
+require_once BASEPATH . 'front-functions.php';
 
 /**
  * Class Front
@@ -17,26 +18,84 @@ class FrontController extends Controller
      * ----------
      */
     // The theme path that frontend controllers will use.
-    const THEMEPATH = 'front/2/';
+    const LAYOUT_PATH = 'front/';
+    const STYLE_PATH = 'public/css/';
 
     // The Post Model, for accessing post data.
     public static $postModel;
     // The Page Model, for accessing page data.
     public static $pageModel;
+    // The Settings Model, for accessing settings for the front end.
+    public static $settingsModel;
     // The directory for the current theme that is set by the system configurations.
-    public static $themeDir;
+    public static $layoutDir;
+    // The directory for the current style, set by system configurations
+    public static $stylesheet;
+    // The engine for rending post and page templates.
+    static $app;
 
     /* ---------------
      *  Constructors
      * ---------------
      */
     public function __construct() {
+        global $router;
         // Instantiate a new Post model.
         static::$postModel = new Post();
         // Init the Page Model.
         static::$pageModel = new Page();
-        // Set the theme path.
-        static::$themeDir = static::THEMEPATH;
+        // Init Settings
+        static::$settingsModel = new Settings();
+
+        // Set the theming for the frontend.
+        $this->setFrontTheming();
+
+        static::$app = $router;
+        $this->setFrontData();
+    }
+
+    /**
+     * Set the theming variables for the frontend
+     *
+     * Set the layout directory, and the path to the stylesheet,
+     * as configured by the user.
+     *
+     * @return void
+     */
+    function setFrontTheming() {
+        // Get layout and style settings from Settings model.
+        $layoutAndStyle = static::$settingsModel->getLayoutAndStyle();
+        // Set layout dir - contains trailing slash.
+        static::$layoutDir = static::LAYOUT_PATH . $layoutAndStyle['layout'] . '/';
+        // Set stylesheet - the path to the exact, single stylesheet.
+        static::$stylesheet = static::STYLE_PATH . $layoutAndStyle['style'] . '.css';
+    }
+
+    /**
+     * Set the data displayed on the frontend
+     *
+     * Set the app data, including the stylesheet directory, path
+     * to bootstrap CSS file, logo, sidebar content, site title and subtitle, and copyright notice.
+     *
+     * @return  void
+     */
+    function setFrontData() {
+        // Set the style for the views.
+        $bootstrapPath = "public/bootstrap/css/bootstrap.min.css";
+        static::$app->view->setData( 'stylesheet', static::$stylesheet );
+        static::$app->view->setData( 'bootstrap', $bootstrapPath );
+        // Set the sidebar content.
+        static::$app->view->setData( 'sidebar_content',
+            ( static::$settingsModel->getSidebarContent() ) );
+        // Set site settings, including logo, title, subtitle, copyright notice.
+        static::$app->view->setData( 'site_settings',
+            ( static::$settingsModel->getSiteSettings() ) );
+        // Set primary menu.
+        static::$app->view->setData( 'primary_menu',
+            ( static::$settingsModel->getPrimaryMenu() ) );
+        // Set secondary menu.
+        static::$app->view->setData( 'secondary_menu',
+            ( static::$settingsModel->getSecondaryMenu() ) );
     }
 
 
@@ -59,50 +118,33 @@ class FrontController extends Controller
     /**
      * Render a post on the front end.
      */
-    function post( $slug, $app ) {
-        // Set the style for the views.
-        $style = "Slate";
-        $bootstrapPath = "public/bootstrap/css/bootstrap.min.css";
-        $app->view->setData( 'stylesheet', "public/css/$style.css" );
-        $app->view->setData( 'bootstrap', $bootstrapPath );
-        $app->view->setData( 'logo_url',
-            'http://ewa.ozythemes.com/layout02/wp-content/uploads/sites/2/2013/04/logo_green_x2.png' );
-        $app->view->setData( 'site_subtitle', 'This is the site subtitle' );
-        $app->view->setData( 'copyright', '&copy; 2014' );
-
+    function post( $slug ) {
+        // Set the post data and html content.
         $postData = static::$postModel->getSummary( $slug );
         $postHtml = static::$postModel->getHtml( $slug );
         $postData['content'] = $postHtml;
 
-        $app->render( static::$themeDir . 'post.php', array (
+        // Render the post.
+        static::$app->render( static::$layoutDir . 'post.php', array (
                 'meta_title' => $postData['title'],
                 'post_data' => $postData,
-                'sidebar_content' => "<p>Hello there sidebar<p>",
             ) );
-    } // post ()
+    }
 
     /**
      * Render a page on the front end.
      */
-    function page( $slug, $app ) {
-        // Set the style for the views.
-        $style = "Slate";
-        $bootstrapPath = "public/bootstrap/css/bootstrap.min.css";
-        $app->view->setData( 'stylesheet', "public/css/$style.css" );
-        $app->view->setData( 'bootstrap', $bootstrapPath );
-        $app->view->setData( 'logo_url',
-            'http://ewa.ozythemes.com/layout02/wp-content/uploads/sites/2/2013/04/logo_green_x2.png' );
-        $app->view->setData( 'site_subtitle', 'This is the site subtitle' );
-        $app->view->setData( 'copyright', '&copy; 2014' );
-
+    function page( $slug ) {
+        // Set the page content and other data.
         $pageData = static::$pageModel->getSummary( $slug );
         $pageHtml = static::$pageModel->getHtml( $slug );
         $pageData['content'] = $pageHtml;
 
-        $app->render( static::$themeDir . 'page.php', array (
-            'meta_title' => $pageData['title'],
-            'post_data' => $pageData,
-        ) );
-    } // page ()
+        // Render the page.
+        static::$app->render( static::$layoutDir . 'page.php', array (
+                'meta_title' => $pageData['title'],
+                'post_data' => $pageData,
+            ) );
+    }
 
 } // class Front
