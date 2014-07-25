@@ -1,7 +1,8 @@
 <?php namespace ninja\Routes;
 
-use ninja\Controllers\AdminController as AdminController;
-use ninja\Controllers\FrontController as FrontController;
+use ninja\Controllers\AuthController;
+use ninja\Controllers\AdminController;
+use ninja\Controllers\FrontController;
 
 //echo "Creating new Slim object<br/>";
 // $router = new \Slim\Slim();
@@ -25,6 +26,9 @@ require_once APPPATH . 'controllers/FrontController.php';
 // Admin Controller
 require_once APPPATH . 'controllers/AdminController.php';
 
+require_once APPPATH . 'controllers/AuthController.php';
+
+$auth = new AuthController();
 $admin = new AdminController();
 $front = new FrontController();
 
@@ -55,6 +59,8 @@ $router->get( '/', function () use ( $front ) {
 /*
  * Static AJAX Admin Routes
  */
+require_once('auth.php');
+
 require_once('ajax.php');
 //echo "done ajax";
 /*

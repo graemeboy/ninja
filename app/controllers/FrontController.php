@@ -20,6 +20,7 @@ class FrontController extends Controller
     // The theme path that frontend controllers will use.
     const LAYOUT_PATH = 'front/';
     const STYLE_PATH = 'public/css/';
+    const PUBLIC_DIR = 'public/';
 
     // The Post Model, for accessing post data.
     public static $postModel;
@@ -96,6 +97,44 @@ class FrontController extends Controller
         // Set secondary menu.
         static::$app->view->setData( 'secondary_menu',
             ( static::$settingsModel->getSecondaryMenu() ) );
+        // Set public path
+        static::$app->view->setData( 'public_dir', self::PUBLIC_DIR );
+    }
+
+    function renderPost( $slug ) {
+        $postData = static::$postModel->getSummary( $slug );
+        $postHtml = static::$postModel->getHtml( $slug );
+        $postData['content'] = $postHtml;
+
+        $socialButtonSettings = static::$settingsModel->getSocialButtonSettings();
+        if (!empty($socialButtonSettings) && $socialButtonSettings === 'share_post_bottom') {
+            $networks = array (
+                'facebook', 'googleplus', 'twitter', 'stumbleupon', 'linkedin', 'reddit'
+            );
+            $shareButtons = "<style>.post-bottom-share-button{display:inline-block;margin-right:15px;margin-bottom:5px;width:180px}</style>";
+            $shareButtons .= getSocialButtons($networks, 'post-bottom-share-button');
+            static::$app->view->setData('shareButtons', $shareButtons);
+        }
+
+        // Render the post.
+        $this->renderContent ($postData, 'post.php');
+    }
+
+    function renderPage( $slug ) {
+        // Set the page content and other data.
+        $pageData = static::$pageModel->getSummary( $slug );
+        $pageHtml = static::$pageModel->getHtml( $slug );
+        $pageData['content'] = $pageHtml;
+
+        // Render the page.
+        $this->renderContent($pageData, 'page.php');
+    }
+
+    function renderContent($data, $file) {
+        static::$app->render( static::$layoutDir . $file, array (
+            'meta_title' => $data['title'],
+            'post_data' => $data,
+        ) );
     }
 
 
@@ -111,40 +150,38 @@ class FrontController extends Controller
      * @post the homepage is rendered.
      */
     function index() {
-        echo "Welcome to the homepage";
-        echo "Data path is: " . DATAPATH;
+        $homepageContent = static::$settingsModel->getHomepageType();
+        // Check the settings model to see whether
+        if ( $homepageContent === 'posts' ) {
+            // the user wants to display posts or a static page.
+            // Get the excerpts for the last $num number of posts
+            $numExcerpts = 5;
+            $excerpts = static::$postModel->getExcerpts( $numExcerpts );
+            $this->renderContent( array(
+                'title' => 'Home',
+                'excerpts' => $excerpts,
+                ), 'index.php' );
+            // Set the app data, giving it the excerpts.
+            // Render content, using the "home.php" file for rendering.
+        } else {
+            // Show a static page
+            $slug = 'home';
+            $this->renderPage( $slug );
+        }
     } // index ()
 
     /**
      * Render a post on the front end.
      */
     function post( $slug ) {
-        // Set the post data and html content.
-        $postData = static::$postModel->getSummary( $slug );
-        $postHtml = static::$postModel->getHtml( $slug );
-        $postData['content'] = $postHtml;
-
-        // Render the post.
-        static::$app->render( static::$layoutDir . 'post.php', array (
-                'meta_title' => $postData['title'],
-                'post_data' => $postData,
-            ) );
+        $this->renderPost( $slug );
     }
 
     /**
      * Render a page on the front end.
      */
     function page( $slug ) {
-        // Set the page content and other data.
-        $pageData = static::$pageModel->getSummary( $slug );
-        $pageHtml = static::$pageModel->getHtml( $slug );
-        $pageData['content'] = $pageHtml;
-
-        // Render the page.
-        static::$app->render( static::$layoutDir . 'page.php', array (
-                'meta_title' => $pageData['title'],
-                'post_data' => $pageData,
-            ) );
+        $this->renderPage( $slug );
     }
 
 } // class Front

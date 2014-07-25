@@ -57,7 +57,7 @@ class AdminController extends Controller
      * @var  Array an array of strings that identify the layouts.
      */
     public static $layouts = array (
-        'default', '1', '2'
+        'default', '1', '2', '3', '4', '5', '6', '7', '8'
     );
 
     static $app;
@@ -104,9 +104,9 @@ class AdminController extends Controller
      * redirect the user to the dashboard.
      *
      */
-    public function index( $app ) {
+    public function index( ) {
         // If logged in, redirect to the dashboard.
-        $app->redirect( '/admin/dashboard' );
+        static::$app->redirect( '/' . ADMIN_PATH . '/dashboard' );
     }
 
     /**
@@ -218,14 +218,28 @@ class AdminController extends Controller
         }
     }
 
+    function admin_ajax_sitemap_save ( $data ) {
+        if (!empty($data['sitemap_slug'])) {
+            static::$settingsModel->updateSitemap ( $data );
+        }
+    }
+
 
     /**
      * Render the Admin Dashboard
      */
     public function dashboard( ) {
+        $contentStats = array (
+            'num_posts' => static::$postModel->getCount(),
+            'num_pages' => static::$pageModel->getCount(),
+            'num_media' => static::$postModel->getMediaCount(),
+        );
         static::$app->render( 'admin/dashboard.php', array (
                 'head_title' => "Admin Dashboard",
-                'meta_title' => 'Admin Dashboard'
+                'meta_title' => 'Admin Dashboard',
+                'content_stats' => $contentStats,
+                'site_settings' => static::$settingsModel->getSiteSettings(),
+                'appearance_settings' => static::$settingsModel->getAppearanceSettings(),
             ) );
     }
 
@@ -259,6 +273,7 @@ class AdminController extends Controller
                 ),
                 'save_button' => 'Publish',
                 'post_data' => $post_data,
+                'admin_settings' => static::$settingsModel->getAdminSettings()
             ) );
     }
 
@@ -353,6 +368,7 @@ class AdminController extends Controller
                     '/public/fontawesome/css/font-awesome.min.css'
                 ),
                 'save_button' => 'Save Post',
+                'admin_settings' => static::$settingsModel->getAdminSettings()
             ) );
     }
 
@@ -415,27 +431,43 @@ class AdminController extends Controller
      * function layoutStyle
      *
      */
-    function layoutStyle( ) {
+    function layout( ) {
         $settings = static::$settingsModel->getAppearanceSettings();
         // Set some defaults in case mandatory variables are not set.
         if ( empty( $settings['layout'] ) ) {
             $settings['layout'] = 'default';
         }
+        
+
+        static::$app->render( 'admin/appearance/layout.php', array (
+                'page_title' => "Site Layout",
+                'page_subtitle' => "The structure of your site.",
+                'meta_title' => "Site Layout - Admin Dashboard",
+                'scripts' => array (
+                    '/public/js/appearance.js',
+                ),
+                'settings' => $settings,
+                'layouts' => static::$layouts,
+                'thumbPath' => self::THUMBNAIL_PATH
+            ) );
+    }
+
+    function style() {
+        $settings = static::$settingsModel->getAppearanceSettings();
+        // Set to default if empty
         if ( empty( $settings['style'] ) ) {
             $settings['style'] = 'cerulean';
         }
 
-
-
-        static::$app->render( 'admin/appearance/layoutStyle.php', array (
-                'page_title' => "Layout and Style",
-                'meta_title' => "Layout and Style - Admin Dashboard",
+        static::$app->render( 'admin/appearance/style.php', array (
+                'page_title' => "Site Style",
+                'page_subtitle' => "The colors and typography of your site.",
+                'meta_title' => "Site Style - Admin Dashboard",
                 'scripts' => array (
                     '/public/js/appearance.js',
                 ),
                 'settings' => $settings,
                 'styles' => static::$styles,
-                'layouts' => static::$layouts,
                 'thumbPath' => self::THUMBNAIL_PATH
             ) );
     }
@@ -507,19 +539,77 @@ class AdminController extends Controller
      *-------------------------------
      */
     function settingsSite() {
-        $siteSettings = static::$settingsModel->getSiteSettings();
 
         static::$app->render( 'admin/settings/settings-site.php', array (
                 'page_title' => "Site Settings",
                 'meta_title' => 'Site Settings - Admin Dashboard',
-                'site_settings' => $siteSettings,
+                'site_settings' => static::$settingsModel->getSiteSettings(),
             ) );
     }
 
     function settingsAdmin( ) {
+        $themes = array (
+            'ninja' => 'Ninja',
+            'blue-ninja' => 'Blue Ninja',
+            'samurai' => 'Samurai',
+            'emperor' => 'Emperor',
+            'empress' => 'Empress',
+            'red-ninja' => 'Geisha',
+            'jade' => 'Jade',
+            'dark-jade' => 'Dark Jade'
+        );
         static::$app->render( 'admin/settings/settings-admin.php', array (
                 'page_title' => "Admin Settings",
-                'meta_title' => 'Admin Settings - Admin Dashboard'
+                'meta_title' => 'Admin Settings - Admin Dashboard',
+                'admin_settings' => static::$settingsModel->getAdminSettings(),
+                'themes' => $themes,
+            ) );
+    }
+
+    /**
+     * Allows the user to create a Google sitemap.
+     */
+    function sitemap () {
+
+        $data = array (
+            'sitemap_slug' => 'first-title',
+            'sitemap_includes' => array(
+                'buddhism-zen', 'page-slug', 'third'
+            )
+        );
+
+        static::$settingsModel->updateSitemap( $data );
+
+        $sitemapSlug = 'sitemap';
+
+        static::$app->render( 'admin/settings/sitemap.php', array (
+            'page_title' => "Sitemap Creator",
+            'meta_title' => 'Sitemap Creator - Admin Dashboard',
+            'all_posts' => static::$postModel->getAll(),
+            'all_pages' => static::$pageModel->getAll(),
+            'sitemap_slug' => static::$settingsModel->getSitemapSlug(),
+            'sitemap_includes' => static::$settingsModel->getSitemapIncludes()
+        ) );
+    }
+
+    function updateHtaccess () {
+        if (!empty($_POST['htaccess'])) {
+            file_put_contents('.htaccess', $_POST['htaccess']);
+        }
+        static::$app->redirect('/admin/htaccess?complete=success');
+    }
+
+    function htaccess () {
+        if (file_exists('.htaccess')) {
+            $htaccessContents = file_get_contents('.htaccess');
+        } else {
+            $htaccessContents = '';
+        }
+        static::$app->render( 'admin/settings/htaccess.php', array (
+                'page_title' => "Edit .htaccess File",
+                'meta_title' => '.htaccess - Admin Dashboard',
+                'site_settings' => static::$settingsModel->getSiteSettings(),
+                'htaccess_contents' => $htaccessContents
             ) );
     }
 
