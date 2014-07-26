@@ -32,10 +32,10 @@ abstract class AbstractWidget {
 			$this->widgetActive = "off";
 		}
 
-		if (!empty($widgetData['widget-order'])) {
-			$this->widgetOrder = $widgetData['widget-order'];
+		if (!empty($widgetData['order'])) {
+			$this->widgetOrder = $widgetData['order'];
 		} else {
-			$this->widgetOrder = "last";
+			$this->widgetOrder = 5;
 		}
 		static::$settingsModel = new Settings();
 	}

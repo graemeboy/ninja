@@ -14,6 +14,7 @@ use ninja\Widget\ShareWidget;
 use ninja\Widget\SocialPagesWidget;
 use ninja\Widget\SocialMetricsWidget;
 use ninja\Widget\TextWidget;
+use ninja\Libraries\Sitemap;
 
 /*
  * A model for getting and updating all site settings.
@@ -28,7 +29,7 @@ class Settings {
 	 * @access public static
 	 * @var array
 	 */
-	public static $defaultAppearance = array (
+	static $defaultAppearance = array (
 		'layout' => 'default',
 		'style' => 'cerulean',
 	);
@@ -41,13 +42,15 @@ class Settings {
 	 */
 	const APPEARANCE_CONFIG = 'config/appearance.json';
 
-	const SITE_CONFIG = 'config/site.json';
-
 	const ADMIN_CONFIG = 'config/admin.json';
-	
+
 	const DEFAULT_SITE_TITLE = 'Example Title';
 
 	const DEFAULT_SITE_SUBTITLE = 'Example subtitle';
+
+	const DEFAULT_LAYOUT = '1';
+
+	const DEFAULT_STYLE = 'amelia';
 
 	/**
 	 * The full path to the appearance configuration.
@@ -55,16 +58,18 @@ class Settings {
 	 * @access public static
 	 * @var string full path to configuration file.
 	 */
-	public static $appearanceConfigPath;
+	static $appearanceConfigPath;
 
-	public static $siteConfigPath;
+	static $siteConfigPath;
 
-	public static $adminConfigPath;
+	static $adminConfigPath;
+
+	static $siteSettings;
 
 	function __construct() {
 		// Set the path to the appearance configuration file.
 		$this->setAppearancePath( APPPATH . self::APPEARANCE_CONFIG );
-		$this->setSitePath ( APPPATH . self::SITE_CONFIG  );
+		$this->setSitePath ( SITE_CONFIG  );
 		$this->setAdminPath ( APPPATH . self::ADMIN_CONFIG );
 	}
 
@@ -77,17 +82,16 @@ class Settings {
 	 * @return array of requested settings if exists, else empty array.
 	 */
 	function getAppearanceSettings() {
-		$jsonData = json_decode( file_get_contents( static::$appearanceConfigPath ), true );
-		if ( !empty( $jsonData ) ) {
-			return $jsonData;
-		} else {
-			// Return an empty arary.
-			return array();
-		}
+		return $this->fillEmptyAppearanceSettings (
+			json_decode( file_get_contents( static::$appearanceConfigPath ), true )
+		);
 	}
 
-	function getLayoutAndStyle () {
+
+
+	function getLayoutAndStyle() {
 		$settings = $this->getAppearanceSettings();
+
 		return array(
 			'layout' => $settings['layout'],
 			'style' => $settings['style'],
@@ -102,7 +106,7 @@ class Settings {
 			// Return an empty arary.
 			$settings = array();
 		}
-		return ( $this->fillEmptyAdminSettings( $settings ) );
+		return $this->fillEmptyAdminSettings( $settings );
 	}
 
 	/**
@@ -174,17 +178,51 @@ class Settings {
 	}
 
 	function getSiteSettings() {
+		// If the siteSettings have been accessed before, they will be stored as a static variable.
+		if ( !empty( static::$siteSettings ) ) {
+			return static::$siteSettings;
+		}
+		// Otherwise, the site settings must be obtained from the configuration file.
 		$jsonData = json_decode( file_get_contents( static::$siteConfigPath ), true );
 		$settings = array();
 		if ( !empty( $jsonData ) ) {
 			$settings = $jsonData;
 		}
-		return ( $this->fillEmptySiteSettings( $settings ) );
+		// Set the static variable to the site settings, and return them.
+		return static::$siteSettings = $this->fillEmptySiteSettings( $settings );
+	}
+
+	function getHomepageType() {
+		$siteSettings = $this->getSiteSettings();
+		if ( !empty( $siteSettings['homepage_content'] ) ) {
+			return $siteSettings['homepage_content'];
+		} else {
+			return "posts";
+		}
+	}
+
+	function getSocialButtonSettings() {
+		$siteSettings = $this->getSiteSettings();
+		if ( !empty( $siteSettings['share_post_bottom'] ) &&
+			$siteSettings['share_post_bottom'] === 'yes' ) {
+			return 'share_post_bottom';
+		} else {
+			return 'none';
+		}
+	}
+
+	function getShareTitle() {
+		$siteSettings = $this->getSiteSettings();
+		if ( !empty( $siteSettings['share_title'] ) ) {
+			return $siteSettings['share_title'];
+		} else {
+			return '';
+		}
 	}
 
 	function getSiteTitle() {
 		$siteSettings = $this->getSiteSettings();
-		if (!empty($siteSettings['site_title'])) {
+		if ( !empty( $siteSettings['site_title'] ) ) {
 			return $siteSettings['site_title'];
 		}
 		return self::DEFAULT_SITE_TITLE;
@@ -192,40 +230,100 @@ class Settings {
 
 	function getSiteSubtitle() {
 		$siteSettings = $this->getSiteSettings();
-		if (!empty($siteSettings['site_subtitle'])) {
+		if ( !empty( $siteSettings['site_subtitle'] ) ) {
 			return $siteSettings['site_subtitle'];
 		}
 		return self::DEFAULT_SITE_SUBTITLE;
 	}
 
-
+	/**
+	 * Fill one array with the key value pairs of another,
+	 * if that array does not contain the keys of the other.
+	 *
+	 * Take all of the keys in defaults, check if they exist in array, if
+	 * they do not, assign the value of the key in defaults to the array.
+	 *
+	 * @param unknown $array    the array to be filled
+	 * @param unknown $defaults the array containing the default keys and values
+	 * @precondition $defaults is not empty
+	 * @postcondition $array contains all of the keys in $defaults
+	 * @return  none.
+	 */
+	function fillDefaults( &$array, $defaults ) {
+		foreach ( $defaults as $key => $def ) {
+			if ( empty( $array[$key] ) ) {
+				$array[$key] = $def;
+			}
+		}
+	}
 
 	function fillEmptySiteSettings( $settings ) {
-		if ( empty( $settings['site_title'] ) ) {
-			$settings['site_title'] = self::DEFAULT_SITE_TITLE;
-		}
-		if ( empty( $settings['logo_url'] ) ) {
-			$settings['logo_url'] = '';
-		}
-		if ( empty( $settings['site_subtitle'] ) ) {
-			$settings['site_subtitle'] = self::DEFAULT_SITE_SUBTITLE;
-		}
-		if ( empty( $settings['copyright'] ) ) {
-			$settings['copyright'] = "&copy; 2014";
-		}
-		if ( empty( $settings['hometitle'] ) ) {
-			$settings['hometitle'] = "Home";
-		}
+		$defaults = array (
+			'site_title' => self::DEFAULT_SITE_TITLE,
+			'site_subtitle' => self::DEFAULT_SITE_SUBTITLE,
+			'logo_url' => '',
+			'copyright' => "&copy; 2014",
+			'hometitle' => 'Home',
+			'share_title' => '',
+			'sitemap_slug' => '',
+			'homepage_content' => 'posts'
+		);
+		$this->fillDefaults( $settings, $defaults );
 		return $settings;
 	}
 
-	function fillEmptyAdminSettings ( $settings )  {
-		if (empty($settings['theme'])) {
+	/**
+	 * Fill any required admin settings that are currently empty.
+	 *
+	 * Take in an array of admin settings, and fill in any necessary settings
+	 * with defaults if those settings are currently empty.
+	 *
+	 * @access public
+	 * @return  $settings an array of admin settings, with all necessary settings filled.
+	 */
+	function fillEmptyAdminSettings( $settings ) {
+		if ( empty( $settings['theme'] ) ) {
 			$settings['theme'] = 'ninja';
 		}
+		if ( empty( $settings['signin_path'] ) ) {
+			$settings['signin_path'] = 'auth/sign-in';
+		}
+		if ( empty( $settings['admin_path'] ) ) {
+			$settings['admin_path'] = 'admin';
+		}
 		return $settings;
 	}
 
+	function getSigninPath() {
+		$settings = $this->getAdminSettings();
+		return $settings['signin_path'];
+	}
+
+	/**
+	 * Fill any required appearance settings that are currently empty.
+	 *
+	 * Take in an array of the current appearance settings, and fill any
+	 * required setting that is currently empty with the default value.
+	 *
+	 * @access public
+	 * @return  array $settings an array of current settings with required settings filled in.
+	 */
+	function fillEmptyAppearanceSettings( $settings ) {
+		if ( empty( $settings['layout'] ) ) {
+			$settings['layout'] = self::DEFAULT_LAYOUT;
+		}
+		if ( empty( $settings['style'] ) ) {
+			$settings['style'] = self::DEFAULT_STYLE;
+		}
+		return $settings;
+	}
+
+	/**
+	 * Return the id of the admin theme currently in use.
+	 *
+	 * @access  public
+	 * @return  the id of the admin theme,
+	 */
 	function getAdminTheme() {
 		$settings = $this->getAdminSettings();
 		return $settings['theme'];
@@ -242,12 +340,24 @@ class Settings {
 		$widgets = $this->getWidgetSettings();
 		// Append the active widgets to the active widget array.
 		foreach ( $widgets as $id=>$settings ) {
-			if ( $settings['active'] = 'on' ) {
+			if ( $settings['active'] === 'on' ) {
 				$activeWidgets[$id] = $settings;
 			}
 		}
-		// Return the active wdiget array.
+		uasort($activeWidgets, array($this, "widgetSort"));
+		// Return the active widget array, ordered by order.
 		return $activeWidgets;
+	}
+
+	function widgetSort($a, $b) {
+		$a = intval($a['order']);
+		$b = intval($b['order']);
+		if ($a === $b) {
+			return 0;
+		} else if ($a > $b) {
+			return 1;
+		}
+		return -1;
 	}
 
 	/**
@@ -269,7 +379,7 @@ class Settings {
 			$widget = $this->initWidget( $id, $settings );
 			if ( !empty ( $widget ) ) {
 				// Call the widget's print function.
-				$content .= $widget->getDisplay() . "\n";
+				$content .= "<div class='widget'>" . $widget->getDisplay() . "</div>\n";
 			}
 		}
 		// Return the final content for the sidebar.
@@ -349,6 +459,8 @@ class Settings {
 		}
 		return $settings;
 	}
+
+
 
 	/**
 	 * Update widget settings with new settings, saving them to the appearance config file.
@@ -441,11 +553,80 @@ class Settings {
 		file_put_contents( static::$siteConfigPath, $settings );
 	}
 
-	function saveAdminSettings ( $settings ) {
+	function saveAdminSettings( $settings ) {
 		// Encode the settings to JSON format.
 		$settings = json_encode( $settings );
 		// Update the site settings configuration file.
 		file_put_contents( static::$adminConfigPath, $settings );
+	}
+
+
+	/**
+	 * Return the slug to the sitemap page
+	 */
+	function getSitemapSlug() {
+		$settings = $this->getSiteSettings();
+		return $settings['sitemap_slug'];
+	}
+
+	/**
+	 * Returns the slugs of all posts and pages included in the sitemap
+	 *
+	 * @return  String array all of the slugs for posts and pages included in sitemap.
+	 */
+	function getSitemapIncludes() {
+		$settings = $this->getSiteSettings();
+		// Return the sitemap slugs, or an empty array if not set.
+		if ( !empty( $settings['sitemap_includes'] ) ) {
+			return $settings['sitemap_includes'];
+		} else {
+			return array();
+		}
+	}
+
+
+
+	/**
+	 * Update the sitemap page from a list of urls.
+	 *
+	 * Create a new XML file with references to all posts and pages
+	 * specified by the user in the sitemap settings page.
+	 *
+	 * @param array   $data includes the sitemap slug setting, and the urls for references.
+	 */
+	function updateSitemap( $data ) {
+		$sitemapSlug = $data['sitemap_slug'];
+		$baseUrl = $_SERVER['SERVER_NAME'];
+		$sitemapIncludes = $data['sitemap_includes'];
+
+		// Update the XML file itself.
+		$this->createSitemapFile( $baseUrl, $sitemapSlug, $sitemapIncludes );
+
+		// Save the new settings.
+		$settings = $this->getSiteSettings();
+		$settings['sitemap_slug'] = $sitemapSlug;
+		$settings['sitemap_includes'] = $sitemapIncludes;
+		$this->saveSiteSettings( $settings );
+	}
+
+	/**
+	 * Create an XML file for the sitemap.
+	 */
+	function createSitemapFile( $baseUrl, $sitemapSlug, $sitemapIncludes ) {
+		// Use the sitemap library.
+		include APPPATH . 'libraries/Sitemap.php';
+		$sitemap = new Sitemap( $baseUrl );
+		$sitemap->setPath( 'public/xml/' );
+
+		// Add each of the pages and posts saved by the user.
+		if ( !empty( $data['sitemap_includes'] ) ) {
+			foreach ( $sitemapIncludes as $includeSlug ) {
+				$sitemap->addItem( '/' . $includeSlug );
+			}
+		}
+
+		// Create the sitemap.
+		$sitemap->createSitemapIndex( $baseUrl . '/' . $sitemapSlug, 'Today' );
 	}
 }
 

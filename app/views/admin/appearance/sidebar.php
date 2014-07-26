@@ -49,23 +49,22 @@
 	}
 
     function printOrderOption($widget_settings, $id) { 
-    	if (isset($widget_settings['order'])) {
+    	if (!empty($widget_settings['order'])) {
     		$order = $widget_settings['order'];
     	} else {
     		$order = '';
     	}
     	$orderOptions = array (
-    		0 => 'First',
-    		1 => 'Second',
-    		2 => 'Third',
-    		3 => 'Fourth',
-    		4 => 'Fifth'
+    		1 => 'First',
+    		2 => 'Second',
+    		3 => 'Third',
+    		4 => 'Fourth',
     	);
     	?>
 		<div class="col-md-4">
 				<div class="form-group">
 					<label class="control-label">Order</label>
-					<select class="form-control" name="widget-order">
+					<select class="form-control" name="order">
 						<?php
 						foreach ($orderOptions as $val=>$label) {
 							echo "<option value='$val'";
@@ -223,20 +222,20 @@
 	<div class="row">
 		<?php
 		// Social Metrics Widget
-		$id = 'social-metrics';
-		$this_widget_settings = $widget_settings[$id];
-		startWidget($this_widget_settings, $id, 'Social Metrics');
-		echo "<p>Show how many likes or shares you have for your pages, for these networks:</p>";
-		$checkboxClass = "networks";
+		// $id = 'social-metrics';
+		// $this_widget_settings = $widget_settings[$id];
+		// startWidget($this_widget_settings, $id, 'Social Metrics');
+		// echo "<p>Show how many likes or shares you have for your pages, for these networks:</p>";
+		// $checkboxClass = "networks";
 
-		// Define all social networks that allow easy access to metrics, format: id=>title
-		$socialNetworks = array (
-			'facebook' => 'Facebook',
-			'twitter' => 'Twitter'
-		);
-		// Print the checkboxes for all social networks.
-		printNetworksOptions($socialNetworks, $this_widget_settings, $id, $checkboxClass);
-		endWidget($id);
+		// // Define all social networks that allow easy access to metrics, format: id=>title
+		// $socialNetworks = array (
+		// 	'facebook' => 'Facebook',
+		// 	'twitter' => 'Twitter'
+		// );
+		// // Print the checkboxes for all social networks.
+		// printNetworksOptions($socialNetworks, $this_widget_settings, $id, $checkboxClass);
+		// endWidget($id);
 
 		// Plain text widget
 		$id = 'plain-text';
